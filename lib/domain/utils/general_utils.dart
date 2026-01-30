@@ -40,6 +40,7 @@ class GeneralUtils {
 
       controller: searchBarController,
       hintText: 'Rechercher ici',
+      hintStyle: WidgetStatePropertyAll(TextStyle(color: AppColors.grey)),
 
       // backgroundColor: WidgetStatePropertyAll(
       //   ThemeUtil.allThemes(context).scaffoldBackgroundColor,
@@ -47,7 +48,7 @@ class GeneralUtils {
       elevation: const WidgetStatePropertyAll(0.0),
 
       side: WidgetStatePropertyAll(
-        BorderSide(color: Theme.of(context).colorScheme.onSurface),
+        BorderSide(color: Colors.grey.withValues(alpha: 0.3)),
       ),
     );
   }
@@ -69,7 +70,7 @@ class GeneralUtils {
       validator: validator,
       isExpanded: true,
       isDense: true,
-      value: controller.text.isEmpty
+      initialValue: controller.text.isEmpty
           ? null
           : items.firstWhere(
               (element) => element == controller.text,
@@ -109,21 +110,33 @@ class GeneralUtils {
             ? InputBorder.none
             : hasUnderlinedBorder
             ? UnderlineInputBorder(
-                borderSide: BorderSide(width: 2, color: AppColors.blue),
+                borderSide: BorderSide(
+                  width: 2,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
               )
             : OutlineInputBorder(
                 borderRadius: BorderRadius.circular(appRadius),
-                borderSide: BorderSide(width: 2, color: AppColors.blue),
+                borderSide: BorderSide(
+                  width: 2,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
               ),
         enabledBorder: noBorder
             ? InputBorder.none
             : hasUnderlinedBorder
             ? UnderlineInputBorder(
-                borderSide: BorderSide(width: 2, color: AppColors.grey),
+                borderSide: BorderSide(
+                  width: 2,
+                  color: Colors.grey.withValues(alpha: 0.3),
+                ),
               )
             : OutlineInputBorder(
                 borderRadius: BorderRadius.circular(appRadius),
-                borderSide: BorderSide(width: 2, color: AppColors.grey),
+                borderSide: BorderSide(
+                  width: 2,
+                  color: Colors.grey.withValues(alpha: 0.3),
+                ),
               ),
       ),
       items: items
@@ -138,7 +151,9 @@ class GeneralUtils {
 
   Material generalButton({
     Color? backColor = Colors.transparent,
+    Color? textColor = Colors.white,
     Widget? child,
+    String text = "",
     double radius = 50,
     // double radius = 15,
     EdgeInsets? padding,
@@ -150,7 +165,7 @@ class GeneralUtils {
     return Material(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(radius),
-        side: BorderSide(color: borderColor, width: 1),
+        side: BorderSide(color: borderColor, width: 2),
       ),
       elevation: 0.0,
       shadowColor: Colors.transparent,
@@ -167,12 +182,25 @@ class GeneralUtils {
         onLongPress: longPressAction,
         customBorder: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(radius),
-          side: BorderSide(color: borderColor, width: 1),
+          side: BorderSide(color: borderColor, width: 2),
         ),
         child: Padding(
           padding:
-              padding ?? EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-          child: Center(child: child),
+              padding ?? EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+          child: Center(
+            child: text.isNotEmpty
+                ? Text(
+                    text,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: borderColor != Colors.transparent
+                          ? borderColor
+                          : textColor,
+                    ),
+                  )
+                : child,
+          ),
         ),
       ),
     );
@@ -203,7 +231,7 @@ class GeneralUtils {
     return showCupertinoDialog(
       barrierDismissible: barrierDismissible,
       context: context,
-      builder: (context) {
+      builder: (buildContext) {
         final consultationProvider = Provider.of<GeneralProvider>(context);
 
         return AlertDialog(
@@ -211,7 +239,7 @@ class GeneralUtils {
             borderRadius: BorderRadius.circular(20),
             side: BorderSide(
               color: Theme.of(
-                context,
+                buildContext,
               ).colorScheme.outline.withValues(alpha: 0.2),
             ),
           ),
@@ -343,6 +371,7 @@ class GeneralUtils {
     bool onlyDouble = false,
     String? hintText,
     String? suffixText,
+    Icon? prefixIcon,
     bool centerText = false,
     bool underLinedBorder = false,
     bool noBorder = false,
@@ -355,6 +384,8 @@ class GeneralUtils {
     return TextFormField(
       // scrollPadding: EdgeInsets.zero,
       onChanged: (value) {
+        provider.recharge(textEditingController);
+
         onChanged?.call(value);
       },
 
@@ -363,23 +394,31 @@ class GeneralUtils {
           : onlyDouble
           ? [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,10}$'))]
           : [],
+
       keyboardType: onlyNumber ? TextInputType.number : TextInputType.text,
       controller: textEditingController,
       readOnly: readOnly,
       textAlign: centerText ? TextAlign.center : TextAlign.start,
       decoration: InputDecoration(
+        prefixIcon: prefixIcon,
         border: noBorder
             ? InputBorder.none
             : underLinedBorder
-            ? UnderlineInputBorder()
-            : OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+            ? UnderlineInputBorder(
+                borderSide: BorderSide(color: AppColors.grey2),
+              )
+            : OutlineInputBorder(
+                borderRadius: BorderRadius.circular(30),
+                borderSide: BorderSide(color: AppColors.grey2),
+              ),
+        // contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
 
-        isDense: !underLinedBorder,
+        // isDense: !underLinedBorder,
         hintText: hintText,
         suffixText: suffixText,
 
         hintStyle: TextStyle(
-          color: AppColors.grey,
+          color: AppColors.grey2,
           fontWeight: FontWeight.bold,
         ),
 

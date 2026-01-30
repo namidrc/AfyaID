@@ -1,3 +1,6 @@
+import 'package:afya_id/ui/views/emergency/emergency_dashboard.dart';
+import 'package:afya_id/ui/views/journal/consultation_journal.dart';
+import 'package:afya_id/ui/views/views.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:afya_id/ui/styles/app_colors.dart';
@@ -10,25 +13,27 @@ const String appName = "afyaid";
 
 const double appRadius = 25;
 
-const String appFont = "Inter";
+// const String appFont = "Inter";
 
 enum Genre { M, F }
 
-// enum GenreTest {
-//   M('Masculin', Icons.male, Colors.blue),
-//   F('Féminin', Icons.female, Colors.pink);
+enum AppPages {
+  emergency('Emergency', EmergencyDashboard()),
+  addPatient('AddPatient', RegistrationForm()),
+  docPatient('DocPatient', PatientVitalCard(id: '12345')),
+  consultation('Consultation', ConsultationJournal()),
+  journalAudit('JournalAudit', AuditLogs());
 
-//   // Champs personnalisés
-//   final String label;
-//   final IconData icon;
-//   final Color couleur;
+  // Champs personnalisés
+  final String label;
+  final Widget page;
 
-//   // Constructeur constant
-//   const GenreTest(this.label, this.icon, this.couleur);
+  // Constructeur constant
+  const AppPages(this.label, this.page);
 
-//   // Une méthode pour vérifier si c'est un homme
-//   bool get estHomme => this == GenreTest.M;
-// }
+  // Une méthode pour vérifier si c'est un homme
+  // bool get estHomme => this == AppPages.M;
+}
 
 SizedBox noDataError(BuildContext context, {String? text, IconData? icon}) {
   return SizedBox(

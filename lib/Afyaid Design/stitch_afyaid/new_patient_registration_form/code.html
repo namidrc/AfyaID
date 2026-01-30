@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AfyaID - New Patient Registration</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1f96ad",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#121e20",
+                        "emergency-red": "#e63946",
+                        "success-green": "#2d6a4f",
+                        "card-dark": "#1a2a2d",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Lexend', sans-serif; }
+        .hard-shadow { box-shadow: 4px 4px 0px 0px rgba(31, 150, 173, 0.3); }
+        .input-focus:focus { outline: none; border-color: #1f96ad; ring: 2px; ring-color: #1f96ad; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white min-h-screen">
+<!-- Top Navigation Bar -->
+<header class="border-b border-solid border-[#274045] bg-background-light dark:bg-background-dark px-6 md:px-10 lg:px-40 py-3 flex items-center justify-between sticky top-0 z-50">
+<div class="flex items-center gap-4">
+<div class="size-8 text-primary">
+<svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M24 0.757355L47.2426 24L24 47.2426L0.757355 24L24 0.757355ZM21 35.7574V12.2426L9.24264 24L21 35.7574Z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+<h2 class="text-xl font-bold tracking-tight">AfyaID</h2>
+</div>
+<div class="flex flex-1 justify-end gap-8 items-center">
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Patient List</a>
+<a class="text-sm font-medium hover:text-primary transition-colors text-primary" href="#">Emergency Scan</a>
+</nav>
+<div class="flex items-center gap-3">
+<button class="bg-primary hover:bg-primary/90 text-white text-sm font-bold h-10 px-4 rounded-lg transition-all">
+                    Dr. Sarah Kibaki
+                </button>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-primary/20" data-alt="Healthcare professional profile avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA0zf0wh5usW30JRr1mPAYBKsxzsV7z9BtbvMlv_CFI5OGv7aH03sw7c_bNpKJSsBY8m5GjHeifyNnfLzlW6_e4qE8gFX0Ds0rfGT6I6ORVlC7_L1DRORjEMdxbHeazybmpcjlVg1nV5_cY1c_7N0FvX-cvR6gYb0S2OhvSryPZ3oAaDNgtDRV2tgTPAhye6Rfu2HkI_rMqdFfdCgc-x5i1UDFgQn-R_kSmzURntmtroaCHq-pTL1cZZTV_RPy3kXwapiEW0nuwr6k");'>
+</div>
+</div>
+</div>
+</header>
+<main class="max-w-5xl mx-auto px-6 py-8">
+<!-- Breadcrumbs -->
+<div class="flex flex-wrap gap-2 mb-6">
+<a class="text-primary/70 text-sm font-medium" href="#">Dashboard</a>
+<span class="text-primary/40 text-sm font-medium">/</span>
+<span class="text-slate-500 dark:text-slate-300 text-sm font-medium">New Patient Registration</span>
+</div>
+<!-- Headline -->
+<div class="mb-8">
+<h1 class="text-3xl md:text-4xl font-bold tracking-tight">New Patient Registration</h1>
+<p class="text-slate-500 dark:text-[#97bdc4] mt-2">Enroll a new citizen into the AfyaID emergency health database.</p>
+</div>
+<!-- Progress Stepper -->
+<div class="mb-10 bg-white dark:bg-card-dark p-6 rounded-xl hard-shadow">
+<div class="flex flex-col gap-3">
+<div class="flex gap-6 justify-between items-end">
+<div>
+<p class="text-xs uppercase tracking-widest font-bold text-primary mb-1">Step 2 of 4</p>
+<p class="text-lg font-bold">Medical Profile &amp; Biometrics</p>
+</div>
+<p class="text-sm font-medium opacity-70">50% Complete</p>
+</div>
+<div class="h-3 rounded-full bg-slate-200 dark:bg-[#375b62] overflow-hidden">
+<div class="h-full bg-primary" style="width: 50%;"></div>
+</div>
+<div class="flex justify-between text-[10px] font-bold uppercase tracking-tighter opacity-60">
+<span>Identity</span>
+<span class="text-primary">Medical Profile</span>
+<span>Biometrics</span>
+<span>Review</span>
+</div>
+</div>
+</div>
+<form class="space-y-8">
+<!-- Section 1: Personal Details -->
+<section class="bg-white dark:bg-card-dark p-8 rounded-xl hard-shadow">
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-primary">person</span>
+<h2 class="text-xl font-bold">Personal Details</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold opacity-80">Full Name (Legal)</label>
+<input class="bg-slate-50 dark:bg-background-dark border-slate-200 dark:border-[#274045] rounded-lg p-3 text-sm focus:border-primary ring-0" placeholder="John Doe" type="text"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold opacity-80">National ID Number</label>
+<input class="bg-slate-50 dark:bg-background-dark border-slate-200 dark:border-[#274045] rounded-lg p-3 text-sm focus:border-primary" placeholder="ID-000-000-000" type="text"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold opacity-80">Date of Birth</label>
+<input class="bg-slate-50 dark:bg-background-dark border-slate-200 dark:border-[#274045] rounded-lg p-3 text-sm focus:border-primary" type="date"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold opacity-80">Gender Identity</label>
+<select class="bg-slate-50 dark:bg-background-dark border-slate-200 dark:border-[#274045] rounded-lg p-3 text-sm focus:border-primary">
+<option>Male</option>
+<option>Female</option>
+<option>Non-binary</option>
+<option>Prefer not to say</option>
+</select>
+</div>
+</div>
+</section>
+<!-- Section 2: Medical Profile -->
+<section class="bg-white dark:bg-card-dark p-8 rounded-xl hard-shadow">
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-primary">medical_services</span>
+<h2 class="text-xl font-bold">Medical Profile</h2>
+</div>
+<div class="space-y-6">
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold opacity-80">Blood Type</label>
+<div class="grid grid-cols-4 md:grid-cols-8 gap-2">
+<button class="py-2 px-3 border border-primary bg-primary/10 text-primary font-bold rounded text-sm" type="button">A+</button>
+<button class="py-2 px-3 border border-slate-200 dark:border-[#274045] hover:border-primary rounded text-sm transition-colors" type="button">A-</button>
+<button class="py-2 px-3 border border-slate-200 dark:border-[#274045] hover:border-primary rounded text-sm transition-colors" type="button">B+</button>
+<button class="py-2 px-3 border border-slate-200 dark:border-[#274045] hover:border-primary rounded text-sm transition-colors" type="button">B-</button>
+<button class="py-2 px-3 border border-slate-200 dark:border-[#274045] hover:border-primary rounded text-sm transition-colors" type="button">AB+</button>
+<button class="py-2 px-3 border border-slate-200 dark:border-[#274045] hover:border-primary rounded text-sm transition-colors" type="button">AB-</button>
+<button class="py-2 px-3 border border-slate-200 dark:border-[#274045] hover:border-primary rounded text-sm transition-colors" type="button">O+</button>
+<button class="py-2 px-3 border border-slate-200 dark:border-[#274045] hover:border-primary rounded text-sm transition-colors" type="button">O-</button>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold opacity-80">Critical Allergies</label>
+<textarea class="bg-slate-50 dark:bg-background-dark border-slate-200 dark:border-[#274045] rounded-lg p-3 text-sm focus:border-primary" placeholder="Penicillin, Peanuts, Latex..." rows="3"></textarea>
+<p class="text-[10px] text-emergency-red font-bold uppercase flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-xs">warning</span> High priority field for emergency responders
+                        </p>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold opacity-80">Chronic Conditions</label>
+<div class="flex flex-wrap gap-2 mb-2">
+<span class="bg-primary/20 text-primary px-3 py-1 rounded-full text-xs font-bold flex items-center gap-2">Diabetes Type 2 <span class="material-symbols-outlined text-[14px] cursor-pointer">close</span></span>
+<span class="bg-primary/20 text-primary px-3 py-1 rounded-full text-xs font-bold flex items-center gap-2">Hypertension <span class="material-symbols-outlined text-[14px] cursor-pointer">close</span></span>
+</div>
+<input class="bg-slate-50 dark:bg-background-dark border-slate-200 dark:border-[#274045] rounded-lg p-3 text-sm focus:border-primary" placeholder="Add condition and press Enter" type="text"/>
+</div>
+</div>
+</section>
+<!-- Section 3: Biometric Enrollment -->
+<section class="bg-white dark:bg-card-dark p-8 rounded-xl hard-shadow">
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-primary">fingerprint</span>
+<h2 class="text-xl font-bold">Biometric Enrollment</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Face Capture -->
+<div class="bg-slate-50 dark:bg-background-dark border-2 border-dashed border-[#274045] rounded-xl p-6 flex flex-col items-center justify-center text-center">
+<div class="size-24 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-primary">
+<span class="material-symbols-outlined text-5xl">face</span>
+</div>
+<h3 class="font-bold mb-1">Face Recognition</h3>
+<p class="text-xs opacity-60 mb-6">Capture front-facing portrait for instant identification.</p>
+<button class="w-full bg-primary text-white font-bold py-2 rounded-lg text-sm flex items-center justify-center gap-2" type="button">
+<span class="material-symbols-outlined text-sm">photo_camera</span> Capture Face
+                        </button>
+</div>
+<!-- Fingerprint -->
+<div class="bg-slate-50 dark:bg-background-dark border-2 border-dashed border-[#274045] rounded-xl p-6 flex flex-col items-center justify-center text-center">
+<div class="size-24 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-primary">
+<span class="material-symbols-outlined text-5xl">fingerprint</span>
+</div>
+<h3 class="font-bold mb-1">Fingerprint Registration</h3>
+<p class="text-xs opacity-60 mb-6">Scan right index finger via USB peripheral.</p>
+<button class="w-full bg-slate-200 dark:bg-[#375b62] text-slate-700 dark:text-white font-bold py-2 rounded-lg text-sm flex items-center justify-center gap-2" type="button">
+<span class="material-symbols-outlined text-sm">sensors</span> Register Fingerprint
+                        </button>
+</div>
+</div>
+</section>
+<!-- Footer / Consent Area -->
+<div class="sticky bottom-8 bg-white dark:bg-card-dark p-6 rounded-xl hard-shadow border border-primary/20 flex flex-col md:flex-row items-center justify-between gap-6">
+<label class="flex items-start gap-4 cursor-pointer group">
+<div class="relative flex items-center">
+<input class="size-6 rounded border-primary bg-transparent text-primary focus:ring-primary focus:ring-offset-background-dark" type="checkbox"/>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold">Consent Agreement</p>
+<p class="text-xs opacity-70">I confirm that the patient has provided informed consent for emergency data storage and biometric processing.</p>
+</div>
+</label>
+<div class="flex items-center gap-4 w-full md:w-auto">
+<button class="flex-1 md:flex-none px-8 py-3 rounded-lg font-bold text-sm text-emergency-red hover:bg-emergency-red/10 transition-colors" type="button">
+                        Cancel
+                    </button>
+<button class="flex-1 md:flex-none px-12 py-3 bg-primary text-white rounded-lg font-bold text-sm hover:brightness-110 transition-all shadow-lg shadow-primary/20" type="submit">
+                        Continue to Review
+                    </button>
+</div>
+</div>
+</form>
+<footer class="mt-20 pb-10 text-center opacity-40 text-[10px] uppercase tracking-widest font-bold">
+            AfyaID Medical Registry System v2.4.0 • Secure HIPAA Compliant Storage
+        </footer>
+</main>
+</body></html>

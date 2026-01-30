@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AfyaID - Journal des Consultations</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#174c82",
+                        "background-light": "#fafafa",
+                        "background-dark": "#1a1a1a",
+                        "surface-dark": "#242424",
+                        "surface-border": "#333333",
+                        "alert": "#CC6666",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"],
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for the log list */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #333333;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #444444;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-white overflow-hidden">
+<div class="flex h-screen w-full">
+<!-- SIDEBAR -->
+<aside class="w-72 bg-[#121a21] border-r border-[#273645] flex flex-col justify-between shrink-0 z-20">
+<div class="flex flex-col gap-6 p-6">
+<!-- User Profile -->
+<div class="flex items-center gap-3">
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-12 shadow-inner border border-white/10" data-alt="Doctor profile picture showing a medical professional in scrubs" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA2epESk7e1mq0VM50Nxyihe1GftfVeC-7TWR6vd_zvDDu8RceGzNdMk8x40bcRK9TXz_omGln1JzksK8dI1kd2aw2FBfJ-3Og2WmHddUSkbEBvkArV4yOW_h6_Te6_6qsiQYhnJtIuJlKE6BpwCWM54GNduczegChIOxU3L-n5chjiiYxzevF0NXzBc3-6jNmHXWq4tV8uRU_OaB1JPE96fUVRCgI1shWnWflBqI6ktA3a1rMEZztsnMZ35I23NXr-XsjhswrerPM");'>
+</div>
+<div class="flex flex-col">
+<h1 class="text-white text-base font-bold tracking-tight">AfyaID</h1>
+<p class="text-[#97adc4] text-xs font-medium uppercase tracking-wider">Zone Humanitaire</p>
+</div>
+</div>
+<!-- Navigation -->
+<nav class="flex flex-col gap-2 mt-4">
+<a class="group flex items-center gap-3 px-4 py-3 rounded-lg text-[#97adc4] hover:bg-[#1e2936] hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined group-hover:text-white transition-colors">grid_view</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="group flex items-center gap-3 px-4 py-3 rounded-lg text-[#97adc4] hover:bg-[#1e2936] hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined group-hover:text-white transition-colors">group</span>
+<span class="text-sm font-medium">Patients</span>
+</a>
+<!-- Active State -->
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary/20 border border-primary/30 text-white shadow-sm" href="#">
+<span class="material-symbols-outlined fill-1">receipt_long</span>
+<span class="text-sm font-bold">Journal</span>
+</a>
+<a class="group flex items-center gap-3 px-4 py-3 rounded-lg text-[#97adc4] hover:bg-[#1e2936] hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined group-hover:text-white transition-colors">settings</span>
+<span class="text-sm font-medium">Paramètres</span>
+</a>
+</nav>
+</div>
+<!-- Bottom Action -->
+<div class="p-6 border-t border-[#273645]">
+<button class="flex w-full items-center justify-center gap-2 rounded-lg bg-[#273645] py-2.5 text-sm font-bold text-[#97adc4] hover:text-white hover:bg-[#324558] transition-colors">
+<span class="material-symbols-outlined text-[18px]">logout</span>
+                    Déconnexion
+                </button>
+</div>
+</aside>
+<!-- MAIN CONTENT -->
+<main class="flex-1 flex flex-col h-full relative overflow-hidden bg-background-dark">
+<!-- TOP NAVBAR -->
+<header class="flex items-center justify-between border-b border-surface-border bg-[#121a21]/50 backdrop-blur-md px-8 py-4 z-10">
+<div class="flex items-center gap-4 text-white">
+<div class="size-8 rounded bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">shield_lock</span>
+</div>
+<div>
+<h2 class="text-white text-lg font-bold leading-tight tracking-tight">Audit Log</h2>
+<p class="text-xs text-gray-400 font-mono">SECURE::V.4.2.1</p>
+</div>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#273645] hover:bg-[#324558] text-white transition-colors">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+</button>
+<button class="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#273645] hover:bg-[#324558] text-white transition-colors">
+<span class="material-symbols-outlined text-[20px]">help</span>
+</button>
+<button class="flex h-10 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-bold text-white shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all">
+<span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                        Status: Online
+                    </button>
+</div>
+</header>
+<!-- SCROLLABLE CONTENT AREA -->
+<div class="flex-1 overflow-y-auto custom-scrollbar p-8">
+<div class="max-w-5xl mx-auto flex flex-col gap-6">
+<!-- PAGE HEADING & ACTIONS -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-2 border-b border-surface-border/50">
+<div class="flex flex-col gap-2">
+<h1 class="text-3xl font-bold tracking-tight text-white">Journal des Consultations</h1>
+<div class="flex items-center gap-2 text-[#97adc4] text-sm">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+<span>Historique d'accès sécurisé - <span class="text-white font-medium">Zone Kivu Nord</span></span>
+</div>
+</div>
+<button class="flex items-center gap-2 px-4 py-2 bg-surface-border/50 hover:bg-surface-border text-white text-sm font-medium rounded-lg border border-white/5 transition-all">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                            Export Log (CSV)
+                        </button>
+</div>
+<!-- SEARCH & FILTERS -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+<!-- Search Bar -->
+<div class="lg:col-span-7">
+<div class="relative group h-12 w-full">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-[#97adc4] group-focus-within:text-primary transition-colors">search</span>
+</div>
+<input class="block w-full h-full pl-12 pr-4 bg-[#242424] border border-surface-border text-white rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary placeholder-[#607080] transition-all" placeholder="Rechercher par ID Patient ou Docteur..." type="text"/>
+<div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+<span class="text-xs text-[#607080] font-mono border border-[#333] px-1.5 py-0.5 rounded">CMD+K</span>
+</div>
+</div>
+</div>
+<!-- Chips -->
+<div class="lg:col-span-5 flex items-center gap-2 overflow-x-auto pb-1 lg:pb-0">
+<button class="flex items-center gap-2 px-4 h-12 rounded-lg bg-surface-border text-white text-sm font-medium border border-transparent hover:border-gray-500 transition-all whitespace-nowrap">
+<span class="material-symbols-outlined text-[18px]">view_list</span>
+                                Tout afficher
+                            </button>
+<button class="flex items-center gap-2 px-4 h-12 rounded-lg bg-alert/10 text-alert border border-alert/20 hover:bg-alert/20 transition-all whitespace-nowrap">
+<span class="material-symbols-outlined text-[18px]">warning</span>
+                                Urgence
+                            </button>
+<button class="flex items-center gap-2 px-4 h-12 rounded-lg bg-[#242424] text-[#97adc4] border border-surface-border hover:text-white hover:border-gray-600 transition-all whitespace-nowrap">
+<span class="material-symbols-outlined text-[18px]">description</span>
+                                Standard
+                            </button>
+</div>
+</div>
+<!-- AUDIT LIST -->
+<div class="flex flex-col gap-3 mt-2">
+<!-- Date Divider -->
+<div class="flex items-center gap-4 py-2">
+<div class="h-px bg-surface-border flex-1"></div>
+<span class="text-xs font-mono text-[#607080] uppercase tracking-widest">Aujourd'hui - 25 OCT</span>
+<div class="h-px bg-surface-border flex-1"></div>
+</div>
+<!-- Card 1: Emergency -->
+<div class="group relative flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-lg bg-[#242424] border border-surface-border hover:border-alert/40 transition-all duration-200 overflow-hidden shadow-sm">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-alert"></div>
+<div class="flex items-start sm:items-center gap-6 pl-3 w-full">
+<!-- Timestamp -->
+<div class="flex flex-col min-w-[80px] shrink-0">
+<span class="text-white font-mono text-base font-bold">14:30</span>
+<span class="text-[#607080] text-xs font-mono">UTC+2</span>
+</div>
+<!-- Icon -->
+<div class="hidden sm:flex size-10 rounded-full bg-alert/10 items-center justify-center text-alert shrink-0 border border-alert/10">
+<span class="material-symbols-outlined">visibility</span>
+</div>
+<!-- Content -->
+<div class="flex flex-col gap-1">
+<p class="text-gray-300 text-sm leading-relaxed">
+                                        Patient ID <span class="text-white font-mono bg-white/5 px-1 rounded mx-0.5 font-semibold">#9982</span> viewed by <span class="text-white font-semibold hover:underline cursor-pointer">Dr. K. Mutombo</span>
+</p>
+<div class="flex items-center gap-3">
+<span class="text-[#607080] text-[10px] font-mono tracking-wide uppercase">Session: 8F32-X99</span>
+<span class="w-1 h-1 rounded-full bg-[#607080]"></span>
+<span class="text-[#607080] text-[10px]">Access granted via Trauma Unit Terminal 4</span>
+</div>
+</div>
+</div>
+<!-- Badge -->
+<div class="mt-4 sm:mt-0 self-start sm:self-center ml-14 sm:ml-0">
+<div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-alert/10 border border-alert/20 text-alert shadow-[0_0_10px_rgba(204,102,102,0.1)]">
+<span class="material-symbols-outlined text-[16px] fill-1">warning</span>
+<span class="text-[11px] font-bold uppercase tracking-wider">Urgence</span>
+</div>
+</div>
+</div>
+<!-- Card 2: Standard -->
+<div class="group relative flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-lg bg-[#242424] border border-surface-border hover:border-primary/40 transition-all duration-200 overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+<div class="flex items-start sm:items-center gap-6 pl-3 w-full">
+<div class="flex flex-col min-w-[80px] shrink-0">
+<span class="text-white font-mono text-base font-bold">14:15</span>
+<span class="text-[#607080] text-xs font-mono">UTC+2</span>
+</div>
+<div class="hidden sm:flex size-10 rounded-full bg-primary/10 items-center justify-center text-primary shrink-0 border border-primary/10">
+<span class="material-symbols-outlined">edit_document</span>
+</div>
+<div class="flex flex-col gap-1">
+<p class="text-gray-300 text-sm leading-relaxed">
+                                        Patient ID <span class="text-white font-mono bg-white/5 px-1 rounded mx-0.5 font-semibold">#9971</span> record updated by <span class="text-white font-semibold hover:underline cursor-pointer">Inf. J. Doe</span>
+</p>
+<div class="flex items-center gap-3">
+<span class="text-[#607080] text-[10px] font-mono tracking-wide uppercase">Session: 2A91-B44</span>
+<span class="w-1 h-1 rounded-full bg-[#607080]"></span>
+<span class="text-[#607080] text-[10px]">Notes added: "Antibiotics administered"</span>
+</div>
+</div>
+</div>
+<div class="mt-4 sm:mt-0 self-start sm:self-center ml-14 sm:ml-0">
+<div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#273645] border border-surface-border text-[#97adc4]">
+<span class="material-symbols-outlined text-[16px]">description</span>
+<span class="text-[11px] font-bold uppercase tracking-wider">Standard</span>
+</div>
+</div>
+</div>
+<!-- Card 3: Standard (Lab Results) -->
+<div class="group relative flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-lg bg-[#242424] border border-surface-border hover:border-primary/40 transition-all duration-200 overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+<div class="flex items-start sm:items-center gap-6 pl-3 w-full">
+<div class="flex flex-col min-w-[80px] shrink-0">
+<span class="text-white font-mono text-base font-bold">13:45</span>
+<span class="text-[#607080] text-xs font-mono">UTC+2</span>
+</div>
+<div class="hidden sm:flex size-10 rounded-full bg-primary/10 items-center justify-center text-primary shrink-0 border border-primary/10">
+<span class="material-symbols-outlined">biotech</span>
+</div>
+<div class="flex flex-col gap-1">
+<p class="text-gray-300 text-sm leading-relaxed">
+                                        Patient ID <span class="text-white font-mono bg-white/5 px-1 rounded mx-0.5 font-semibold">#9940</span> lab results uploaded
+                                    </p>
+<div class="flex items-center gap-3">
+<span class="text-[#607080] text-[10px] font-mono tracking-wide uppercase">Auto-Sys: LAB-01</span>
+<span class="w-1 h-1 rounded-full bg-[#607080]"></span>
+<span class="text-[#607080] text-[10px]">Type: Blood Panel (Complete)</span>
+</div>
+</div>
+</div>
+<div class="mt-4 sm:mt-0 self-start sm:self-center ml-14 sm:ml-0">
+<div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#273645] border border-surface-border text-[#97adc4]">
+<span class="material-symbols-outlined text-[16px]">science</span>
+<span class="text-[11px] font-bold uppercase tracking-wider">Standard</span>
+</div>
+</div>
+</div>
+<!-- Card 4: Emergency (Transfer) -->
+<div class="group relative flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-lg bg-[#242424] border border-surface-border hover:border-alert/40 transition-all duration-200 overflow-hidden shadow-sm opacity-75 hover:opacity-100">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-alert"></div>
+<div class="flex items-start sm:items-center gap-6 pl-3 w-full">
+<div class="flex flex-col min-w-[80px] shrink-0">
+<span class="text-white font-mono text-base font-bold">12:10</span>
+<span class="text-[#607080] text-xs font-mono">UTC+2</span>
+</div>
+<div class="hidden sm:flex size-10 rounded-full bg-alert/10 items-center justify-center text-alert shrink-0 border border-alert/10">
+<span class="material-symbols-outlined">ambulance</span>
+</div>
+<div class="flex flex-col gap-1">
+<p class="text-gray-300 text-sm leading-relaxed">
+                                        Patient ID <span class="text-white font-mono bg-white/5 px-1 rounded mx-0.5 font-semibold">#9982</span> transfer initiated by <span class="text-white font-semibold hover:underline cursor-pointer">Dr. S. Al-Fayed</span>
+</p>
+<div class="flex items-center gap-3">
+<span class="text-[#607080] text-[10px] font-mono tracking-wide uppercase">Session: 9C11-Z00</span>
+<span class="w-1 h-1 rounded-full bg-[#607080]"></span>
+<span class="text-[#607080] text-[10px]">Destination: Zone Sud Field Hospital</span>
+</div>
+</div>
+</div>
+<div class="mt-4 sm:mt-0 self-start sm:self-center ml-14 sm:ml-0">
+<div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-alert/10 border border-alert/20 text-alert">
+<span class="material-symbols-outlined text-[16px] fill-1">warning</span>
+<span class="text-[11px] font-bold uppercase tracking-wider">Urgence</span>
+</div>
+</div>
+</div>
+<!-- Card 5: Standard (System Check) -->
+<div class="group relative flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-lg bg-[#242424] border border-surface-border hover:border-primary/40 transition-all duration-200 overflow-hidden opacity-60 hover:opacity-100">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-[#607080]"></div>
+<div class="flex items-start sm:items-center gap-6 pl-3 w-full">
+<div class="flex flex-col min-w-[80px] shrink-0">
+<span class="text-white font-mono text-base font-bold">09:00</span>
+<span class="text-[#607080] text-xs font-mono">UTC+2</span>
+</div>
+<div class="hidden sm:flex size-10 rounded-full bg-gray-800 items-center justify-center text-gray-400 shrink-0 border border-gray-700">
+<span class="material-symbols-outlined">dns</span>
+</div>
+<div class="flex flex-col gap-1">
+<p class="text-gray-300 text-sm leading-relaxed">
+                                        Daily Integrity Check completed
+                                    </p>
+<div class="flex items-center gap-3">
+<span class="text-[#607080] text-[10px] font-mono tracking-wide uppercase">Sys: CORE-MAIN</span>
+<span class="w-1 h-1 rounded-full bg-[#607080]"></span>
+<span class="text-[#607080] text-[10px]">No anomalies detected</span>
+</div>
+</div>
+</div>
+<div class="mt-4 sm:mt-0 self-start sm:self-center ml-14 sm:ml-0">
+<div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#273645] border border-surface-border text-[#97adc4]">
+<span class="material-symbols-outlined text-[16px]">settings_system_daydream</span>
+<span class="text-[11px] font-bold uppercase tracking-wider">System</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Pagination Loader -->
+<div class="flex flex-col items-center gap-4 mt-8 pb-12">
+<div class="flex items-center gap-2">
+<div class="h-1.5 w-1.5 bg-primary rounded-full animate-bounce"></div>
+<div class="h-1.5 w-1.5 bg-primary rounded-full animate-bounce [animation-delay:0.2s]"></div>
+<div class="h-1.5 w-1.5 bg-primary rounded-full animate-bounce [animation-delay:0.4s]"></div>
+</div>
+<button class="text-sm font-medium text-[#607080] hover:text-white transition-colors">Charger l'historique plus ancien...</button>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

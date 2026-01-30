@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+
+<html class="light" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tableau de Bord Urgence - AfyaID</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ff0000",
+                        "background-light": "#ffffff",
+                        "background-dark": "#121212",
+                        "surface-light": "#f8f8f8",
+                        "surface-dark": "#1e1e1e",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Subtle technical grid pattern */
+        .bg-tech-grid {
+            background-size: 40px 40px;
+            background-image:
+                linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+        }
+        .dark .bg-tech-grid {
+            background-image:
+                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        }
+    </style>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark text-[#1d0c0c] dark:text-[#fcf8f8] h-screen overflow-hidden flex flex-col md:flex-row antialiased">
+<!-- Navigation Rail / Sidebar -->
+<aside class="w-full md:w-20 lg:w-72 flex flex-row md:flex-col border-b md:border-b-0 md:border-r border-[#e5e7eb] dark:border-[#333] bg-surface-light dark:bg-surface-dark transition-all z-20 shrink-0">
+<!-- User Profile (Top of sidebar) -->
+<div class="p-4 flex items-center gap-4 border-r md:border-r-0 md:border-b border-[#e5e7eb] dark:border-[#333] flex-1 md:flex-none">
+<div class="relative">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 ring-2 ring-primary/20" data-alt="Doctor profile portrait in medical scrubs" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA2fJBdOdctZpDLcnk6WiHGpaN_d9uCkHkIVzBgE9JNAy_SFKQOQ54mC-9JSxZDFckfA_LC91uPRKC1XiqHP6km7p_L3jfKr676shhp2jtHGBVSGNwWi-TEUhphsNGh69nMzLPyFfj0wItxeZeqVUuoUxAt-Oz4rYWDlFYciJ6FLXTnZ7CMBaA3jHWQhAyBizyr_Xs1U1ai3l7eZ7ErzCKjKseObx-64lHgpOg2ZJPGL9J1o8g-xxGM3Lc9zWZEZO6y1ULA2WprWII");'>
+</div>
+<div class="absolute bottom-0 right-0 size-3 bg-green-500 rounded-full border-2 border-white dark:border-[#1e1e1e]"></div>
+</div>
+<div class="hidden lg:flex flex-col">
+<h1 class="text-base font-bold leading-tight">Dr. Moreau</h1>
+<p class="text-primary text-xs font-medium uppercase tracking-wide">Médecin Urgentiste</p>
+</div>
+</div>
+<!-- Nav Links -->
+<nav class="flex md:flex-col gap-1 md:gap-2 p-2 md:p-4 overflow-x-auto md:overflow-visible">
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg bg-primary text-white shadow-md shadow-primary/20 transition-all group" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="hidden lg:block text-sm font-bold">Tableau de bord</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-[#e5e7eb] dark:hover:bg-[#333] text-[#666] dark:text-[#999] transition-colors group" href="#">
+<span class="material-symbols-outlined">folder_shared</span>
+<span class="hidden lg:block text-sm font-medium">Dossiers Patients</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-[#e5e7eb] dark:hover:bg-[#333] text-[#666] dark:text-[#999] transition-colors group" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="hidden lg:block text-sm font-medium">Historique</span>
+</a>
+<div class="hidden md:block h-px w-full bg-[#e5e7eb] dark:bg-[#333] my-2"></div>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-[#e5e7eb] dark:hover:bg-[#333] text-[#666] dark:text-[#999] transition-colors group" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="hidden lg:block text-sm font-medium">Paramètres</span>
+</a>
+</nav>
+<!-- Bottom Action (Sidebar Footer) -->
+<div class="hidden md:flex flex-col p-4 mt-auto border-t border-[#e5e7eb] dark:border-[#333]">
+<div class="p-3 bg-primary/5 rounded-lg border border-primary/10">
+<p class="text-xs text-primary font-bold mb-1">Zone 4 : Sud-Kivu</p>
+<div class="h-1 w-full bg-gray-200 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-3/4"></div>
+</div>
+<p class="text-[10px] text-[#666] mt-1 text-right">Signal: 78%</p>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col relative bg-tech-grid overflow-y-auto">
+<!-- Top Header -->
+<header class="sticky top-0 z-10 flex items-center justify-between px-6 py-4 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md border-b border-[#e5e7eb] dark:border-[#333]">
+<div class="flex items-center gap-3">
+<div class="size-8 text-primary">
+<svg fill="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M19 3H5C3.89 3 3 3.9 3 5V19C3 20.1 3.89 21 5 21H19C20.11 21 21 20.1 21 19V5C21 3.9 20.11 3 19 3ZM10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z"></path>
+</svg>
+</div>
+<h2 class="text-xl font-black tracking-tighter uppercase text-[#1d0c0c] dark:text-white">Afya<span class="text-primary">ID</span></h2>
+</div>
+<div class="flex items-center gap-3">
+<!-- Offline Mode Indicator -->
+<div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 animate-pulse">
+<span class="material-symbols-outlined text-primary text-lg">sync_problem</span>
+<span class="text-primary text-xs font-bold uppercase tracking-widest">Mode Hors-ligne</span>
+</div>
+<button class="flex items-center justify-center size-10 rounded-full bg-surface-light dark:bg-surface-dark border border-[#e5e7eb] dark:border-[#333] hover:border-primary/50 text-[#1d0c0c] dark:text-white transition-all">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+</button>
+</div>
+</header>
+<!-- Content Body -->
+<div class="flex-1 flex flex-col max-w-5xl mx-auto w-full p-6 md:p-10">
+<!-- Page Title Area -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10 md:mb-16">
+<div>
+<h2 class="text-3xl md:text-4xl font-black tracking-tight text-[#1d0c0c] dark:text-white mb-2">Tableau de Bord Urgence</h2>
+<p class="text-primary/80 font-medium text-lg flex items-center gap-2">
+<span class="material-symbols-outlined text-base">location_on</span>
+                        Centre de commande mobile - Zone 4
+                    </p>
+</div>
+<!-- Mini Stats (Peripheral) -->
+<div class="flex gap-4">
+<div class="text-right">
+<p class="text-2xl font-bold text-[#1d0c0c] dark:text-white">12</p>
+<p class="text-xs text-[#666] uppercase">Patients Actifs</p>
+</div>
+<div class="w-px bg-gray-200 dark:bg-gray-700 h-10"></div>
+<div class="text-right">
+<p class="text-2xl font-bold text-primary">03</p>
+<p class="text-xs text-[#666] uppercase">Alertes Critiques</p>
+</div>
+</div>
+</div>
+<!-- The Cockpit (Center Stage) -->
+<div class="flex flex-col items-center justify-center flex-1 min-h-[400px]">
+<!-- Main FAB - Massive & Centered -->
+<div class="relative group z-10">
+<!-- Decorative rings -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-64 md:size-80 rounded-full border border-primary/10"></div>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-52 md:size-64 rounded-full border border-primary/20 border-dashed animate-[spin_10s_linear_infinite]"></div>
+<!-- Glow effect -->
+<div class="absolute inset-0 bg-primary/20 blur-xl rounded-full scale-90 group-hover:scale-110 transition-transform duration-500"></div>
+<!-- Button -->
+<button class="relative flex flex-col items-center justify-center size-40 md:size-52 rounded-full bg-primary shadow-[0_20px_50px_rgba(255,0,0,0.3)] hover:shadow-[0_20px_60px_rgba(255,0,0,0.5)] border-4 border-red-400 dark:border-red-900 group-active:scale-95 transition-all duration-300">
+<span class="material-symbols-outlined text-7xl md:text-8xl text-white mb-1 animate-pulse">ecg_heart</span>
+<span class="text-xs md:text-sm font-black text-white uppercase tracking-widest mt-2">Scan D'Urgence</span>
+</button>
+</div>
+<!-- Secondary Actions - Cards Below -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-2xl mt-12 md:mt-16 z-10">
+<!-- Face ID Card -->
+<button class="flex items-center gap-5 p-6 rounded-2xl bg-white dark:bg-[#1e1e1e] border border-[#e5e7eb] dark:border-[#333] shadow-sm hover:shadow-lg hover:border-primary/50 group transition-all text-left">
+<div class="bg-surface-light dark:bg-black rounded-full size-16 flex items-center justify-center shrink-0 group-hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-3xl text-[#1d0c0c] dark:text-white group-hover:text-primary transition-colors">face</span>
+</div>
+<div>
+<h3 class="text-lg font-bold text-[#1d0c0c] dark:text-white mb-1">Reconnaissance Faciale</h3>
+<p class="text-sm text-[#666] dark:text-[#999]">Identifier via scan biométrique</p>
+</div>
+<span class="material-symbols-outlined ml-auto text-gray-300 group-hover:translate-x-1 transition-transform">arrow_forward_ios</span>
+</button>
+<!-- Fingerprint Card -->
+<button class="flex items-center gap-5 p-6 rounded-2xl bg-white dark:bg-[#1e1e1e] border border-[#e5e7eb] dark:border-[#333] shadow-sm hover:shadow-lg hover:border-primary/50 group transition-all text-left">
+<div class="bg-surface-light dark:bg-black rounded-full size-16 flex items-center justify-center shrink-0 group-hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-3xl text-[#1d0c0c] dark:text-white group-hover:text-primary transition-colors">fingerprint</span>
+</div>
+<div>
+<h3 class="text-lg font-bold text-[#1d0c0c] dark:text-white mb-1">Empreinte Digitale</h3>
+<p class="text-sm text-[#666] dark:text-[#999]">Scanner l'index ou le pouce</p>
+</div>
+<span class="material-symbols-outlined ml-auto text-gray-300 group-hover:translate-x-1 transition-transform">arrow_forward_ios</span>
+</button>
+</div>
+<!-- Footer Helper Text -->
+<div class="mt-8 md:mt-12 flex items-center gap-2 px-4 py-2 bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-100 dark:border-yellow-900/30 rounded-lg">
+<span class="material-symbols-outlined text-yellow-600 dark:text-yellow-500 text-sm">warning</span>
+<p class="text-xs md:text-sm font-medium text-yellow-800 dark:text-yellow-500">Assurez-vous que le patient est stabilisé avant le scan.</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Overlay pattern for context (subtle map or texture) -->
+<div class="fixed inset-0 pointer-events-none opacity-[0.02] dark:opacity-[0.05] z-0" data-alt="Abstract medical background texture or map overlay" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDJghyG3sgnLLmpjbr3GimYWIOMm6djdwwGlLEmEcM-9mbRr3ouzcSvRif_QusVHXN02MIz_LJ1-0uBxVgMUlHDuQbpXFr7CcORUpfKUaPCmSHkFty6KbzwTZiLgqY5F-7wqd2nDTdTXdALV7owKwFFHIKWk4dWNNgOARq1ch-rORVGxPDDnk0MBLFqkeEgWVkeSzSIW1ugDrLFJeUDmNhIJCu9006OCLvmjLOCtRGhtbIIVFmqgtR0mcRtE9-fQp9L1x2H43yLpIk"); background-size: cover; background-position: center;'>
+</div>
+</body></html>

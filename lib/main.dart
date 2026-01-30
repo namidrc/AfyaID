@@ -5,7 +5,7 @@ import 'package:afya_id/ui/providers/general_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'ui/ui.dart';
+import 'package:afya_id/ui/styles/app_theme.dart';
 
 void main() async {
   final pref = await SharedPreferences.getInstance();
@@ -36,11 +36,9 @@ class AfyaID extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           routerConfig: goRouter,
           title: 'AfyaID',
-          darkTheme: ThemeData(
-            colorScheme: .fromSeed(seedColor: AppColors.black0),
-          ),
-          theme: ThemeData(colorScheme: .fromSeed(seedColor: AppColors.white0)),
-          themeMode: !general.isDark ? ThemeMode.dark : ThemeMode.light,
+          darkTheme: AppTheme.darkTheme(context),
+          theme: AppTheme.lightTheme(context),
+          themeMode: general.isDark ? ThemeMode.dark : ThemeMode.light,
         );
       },
     );

@@ -1,3 +1,4 @@
+import 'package:afya_id/domain/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -21,10 +22,10 @@ class GeneralProvider extends ChangeNotifier {
   // }
 
   //Page Navigation handling
-  int pageIndex = 0;
+  AppPages selectedPage = AppPages.emergency;
 
-  void selectedPage(int page) {
-    pageIndex = page;
+  void selectPage(AppPages page) {
+    selectedPage = page;
     notifyListeners();
   }
 

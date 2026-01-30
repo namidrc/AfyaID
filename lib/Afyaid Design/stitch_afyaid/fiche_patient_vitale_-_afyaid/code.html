@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Fiche Patient Vitale - AfyaID</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&amp;family=Noto+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#174c82",
+                        "primary-dark": "#0f355a",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#121920",
+                        "surface-dark": "#1e2933",
+                        "surface-darker": "#161f28",
+                        "alert-red": "#d32f2f",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"],
+                        "body": ["Noto Sans", "sans-serif"],
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Lexend', sans-serif;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .glass-panel {
+            background: rgba(30, 41, 51, 0.7);
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white antialiased min-h-screen flex flex-col">
+<!-- Sticky Header -->
+<header class="sticky top-0 z-50 border-b border-[#273645] bg-[#121920]/95 backdrop-blur-md px-6 py-3 shadow-lg">
+<div class="flex items-center justify-between max-w-[1600px] mx-auto w-full">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3 text-white">
+<div class="size-8 rounded bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-[20px]">medical_services</span>
+</div>
+<h2 class="text-white text-xl font-bold tracking-tight">AfyaID <span class="text-slate-400 font-normal text-sm ml-2 hidden sm:inline-block">| Urgences Humanitaires</span></h2>
+</div>
+<!-- Search Bar -->
+<div class="hidden md:flex items-center bg-[#1e2933] rounded-lg h-10 w-80 border border-[#273645] focus-within:border-primary transition-colors">
+<span class="material-symbols-outlined text-slate-400 px-3">search</span>
+<input class="bg-transparent border-none text-white placeholder-slate-500 focus:ring-0 w-full text-sm h-full font-normal" placeholder="Recherche patient (ID, Nom)" type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600/10 hover:bg-red-600/20 text-red-500 border border-red-600/30 transition-all group">
+<span class="material-symbols-outlined text-[20px] group-hover:animate-pulse">warning</span>
+<span class="text-sm font-bold truncate hidden lg:block">Déclarer Incident</span>
+</button>
+<div class="h-8 w-[1px] bg-[#273645] mx-2"></div>
+<div class="flex items-center gap-3">
+<div class="text-right hidden sm:block">
+<p class="text-xs text-slate-400">Médecin Urgentiste</p>
+<p class="text-sm font-semibold text-white">Dr. Aminata Diop</p>
+</div>
+<div class="size-10 rounded-full bg-cover bg-center border-2 border-[#273645]" data-alt="Portrait of Doctor Aminata Diop" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDMqHv67goJuEOzakAL7ATDGi6qspf4_H_o99AMOl0eM-Er1IRImIivhBWySeJ13YwEDXDqNZxnrkWQf7dLHmEA6hEnMAH-a5F4ydZXzxJ0kY_Wy48zOtQQc3P0u9ru-lVatCx0pv3Cub6dRZb01uqbW50w63Fw-Hade3wbTmhIibxlrqITgPAwpuKozUvB-K4hOQ2M-U8Mpbj1nm-m_WYZNs3Fnlc8adOJHxdaFUgpBRcyc4CHWY2CO2E8LEHsv34n43UO41E8qwE');"></div>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Dashboard Content -->
+<main class="flex-1 p-4 md:p-6 lg:p-8 max-w-[1600px] mx-auto w-full">
+<!-- Breadcrumb / Status -->
+<div class="flex flex-wrap items-center justify-between mb-6 gap-4">
+<div class="flex items-center gap-2 text-slate-400 text-sm">
+<a class="hover:text-white transition-colors" href="#">Accueil</a>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-white font-medium">Fiche Patient #12345</span>
+</div>
+<div class="flex items-center gap-2 px-3 py-1 rounded bg-green-500/10 border border-green-500/20">
+<div class="size-2 rounded-full bg-green-500 animate-pulse"></div>
+<span class="text-xs font-bold text-green-400 uppercase tracking-wider">Synchronisé</span>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+<!-- LEFT COLUMN: Identity & Vitals (4 cols) -->
+<div class="lg:col-span-4 flex flex-col gap-6">
+<!-- Patient Identity Card -->
+<div class="bg-surface-dark rounded-xl p-6 border border-[#273645] shadow-lg relative overflow-hidden group">
+<div class="absolute top-0 left-0 w-full h-1 bg-primary"></div>
+<div class="flex items-start gap-5">
+<div class="relative shrink-0">
+<div class="size-24 rounded-lg bg-cover bg-center shadow-inner" data-alt="Portrait of patient Amara Sylla" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDzIGuNmpl9JKMsc3vh03Ycrp_KKvhdoNpbLai-M2vEyU34uRFGRAhxiiJyMcGQ99a0LRaaKO4XAWY7jN53U4SqSwp2_c8jhkJDGDx92xDuDxfxm0GFbNn3htU7LkF6vI7ejg9uEx5oZXwgsIcFQgMTYlrJla7Z5rKMnv9LHvS-kHIIWM4a6XNUm9qdVrDWgq7ZpRe90yOCaXGTV3At4KWyRrP29IPjBzvQPTYRCAt_MIzfMRJYSRLms1gwE51BxaXZwdad8oV7jn4');"></div>
+<div class="absolute -bottom-2 -right-2 bg-surface-dark p-1 rounded-full">
+<div class="bg-blue-500 text-white p-1 rounded-full flex items-center justify-center" title="Identité Vérifiée">
+<span class="material-symbols-outlined text-[16px]">verified</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<h1 class="text-2xl font-bold text-white leading-tight">Amara Sylla</h1>
+<div class="flex items-center gap-2 text-slate-400 text-sm font-body">
+<span class="material-symbols-outlined text-[18px]">fingerprint</span>
+<span>ID: #12345-AFY</span>
+</div>
+<div class="flex items-center gap-3 mt-2">
+<span class="bg-[#273645] text-white text-xs px-2 py-1 rounded font-medium">34 Ans</span>
+<span class="bg-[#273645] text-white text-xs px-2 py-1 rounded font-medium">Homme</span>
+</div>
+</div>
+</div>
+<div class="mt-6 pt-6 border-t border-[#273645] grid grid-cols-2 gap-4">
+<div>
+<p class="text-xs text-slate-500 uppercase tracking-wider mb-1">Date de Naissance</p>
+<p class="text-sm text-white">12 Mai 1989</p>
+</div>
+<div>
+<p class="text-xs text-slate-500 uppercase tracking-wider mb-1">Localisation</p>
+<p class="text-sm text-white">Camp Goma, Zone B</p>
+</div>
+</div>
+</div>
+<!-- Vitals Snapshot -->
+<div class="bg-surface-dark rounded-xl border border-[#273645] overflow-hidden">
+<div class="p-4 border-b border-[#273645] flex justify-between items-center bg-[#19222b]">
+<h3 class="text-lg font-bold text-white flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">ecg_heart</span>
+                            Constantes Vitales
+                        </h3>
+<span class="text-xs text-slate-400">Il y a 15 min</span>
+</div>
+<div class="p-4 grid grid-cols-2 gap-4">
+<!-- HR -->
+<div class="col-span-1 bg-[#121920] rounded-lg p-3 border border-[#273645] flex flex-col justify-between h-28">
+<div class="flex justify-between items-start">
+<span class="text-xs font-medium text-slate-400">FC (BPM)</span>
+<span class="material-symbols-outlined text-rose-500 text-[20px]">favorite</span>
+</div>
+<div class="flex items-end gap-2">
+<span class="text-3xl font-bold text-white">88</span>
+<span class="text-xs text-green-400 mb-1 flex items-center">
+<span class="material-symbols-outlined text-[14px]">arrow_downward</span>
+                                    -2
+                                </span>
+</div>
+<!-- Mini Sparkline visualization -->
+<div class="h-6 w-full flex items-end gap-1 opacity-40">
+<div class="w-1 bg-rose-500 h-[40%] rounded-sm"></div>
+<div class="w-1 bg-rose-500 h-[60%] rounded-sm"></div>
+<div class="w-1 bg-rose-500 h-[50%] rounded-sm"></div>
+<div class="w-1 bg-rose-500 h-[80%] rounded-sm"></div>
+<div class="w-1 bg-rose-500 h-[70%] rounded-sm"></div>
+<div class="w-1 bg-rose-500 h-[60%] rounded-sm"></div>
+</div>
+</div>
+<!-- SpO2 -->
+<div class="col-span-1 bg-[#121920] rounded-lg p-3 border border-[#273645] flex flex-col justify-between h-28">
+<div class="flex justify-between items-start">
+<span class="text-xs font-medium text-slate-400">SpO2 (%)</span>
+<span class="material-symbols-outlined text-cyan-500 text-[20px]">air</span>
+</div>
+<div class="flex items-end gap-2">
+<span class="text-3xl font-bold text-white">98</span>
+<span class="text-xs text-slate-500 mb-1">Stable</span>
+</div>
+<div class="h-1 w-full bg-slate-700 rounded-full mt-auto">
+<div class="h-1 bg-cyan-500 w-[98%] rounded-full"></div>
+</div>
+</div>
+<!-- BP -->
+<div class="col-span-2 bg-[#121920] rounded-lg p-3 border border-[#273645] flex items-center justify-between">
+<div>
+<span class="text-xs font-medium text-slate-400 block mb-1">Tension Artérielle</span>
+<span class="text-2xl font-bold text-white">120/80</span>
+<span class="text-xs text-slate-500 ml-2">mmHg</span>
+</div>
+<div class="bg-green-500/10 text-green-400 px-2 py-1 rounded text-xs font-bold border border-green-500/20">NORMALE</div>
+</div>
+</div>
+<button class="w-full py-3 text-sm text-primary font-medium hover:bg-[#273645] transition-colors border-t border-[#273645]">
+                        Voir l'historique complet
+                    </button>
+</div>
+</div>
+<!-- CENTER COLUMN: Alerts & History (5 cols) -->
+<div class="lg:col-span-5 flex flex-col gap-6">
+<!-- CRITICAL ALERTS ROW -->
+<div class="grid grid-cols-2 gap-4">
+<!-- Blood Type Alert -->
+<div class="bg-alert-red rounded-xl p-5 shadow-[0_0_15px_rgba(211,47,47,0.3)] relative overflow-hidden">
+<!-- Abstract pattern -->
+<div class="absolute -right-4 -bottom-4 opacity-20">
+<span class="material-symbols-outlined text-[100px] rotate-[-15deg]">bloodtype</span>
+</div>
+<p class="text-red-100 text-xs font-bold uppercase tracking-wider mb-2">Groupe Sanguin</p>
+<p class="text-white text-4xl font-black tracking-tight">O+</p>
+<p class="text-white/80 text-xs mt-2">Donneur Universel (GR)</p>
+</div>
+<!-- Allergy Alert -->
+<div class="bg-[#1e2933] rounded-xl p-5 border-2 border-alert-red shadow-[0_0_10px_rgba(211,47,47,0.15)] relative flex flex-col justify-center">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-alert-red animate-pulse">warning</span>
+<p class="text-alert-red text-xs font-bold uppercase tracking-wider">Allergie Sévère</p>
+</div>
+<p class="text-white text-2xl font-bold leading-tight">ARACHIDES</p>
+<p class="text-slate-400 text-xs mt-1">Réaction: Anaphylaxie</p>
+</div>
+</div>
+<!-- Medical History -->
+<div class="bg-surface-dark rounded-xl border border-[#273645] flex flex-col h-full min-h-[400px]">
+<div class="p-5 border-b border-[#273645] flex justify-between items-center bg-[#19222b]">
+<h3 class="text-lg font-bold text-white flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-400">history</span>
+                            Antécédents &amp; Notes
+                        </h3>
+<button class="size-8 flex items-center justify-center rounded-full hover:bg-[#273645] text-primary transition-colors">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto p-2">
+<!-- History Item 1 -->
+<div class="group flex items-center gap-4 p-3 rounded-lg hover:bg-[#273645] transition-colors cursor-pointer border-b border-[#273645]/50 last:border-0">
+<div class="size-10 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0 text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-colors">
+<span class="material-symbols-outlined">pulmonology</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between mb-1">
+<h4 class="text-white font-medium text-base">Asthme Bronchique</h4>
+<span class="text-xs bg-orange-500/10 text-orange-400 px-2 py-0.5 rounded border border-orange-500/20">Actif</span>
+</div>
+<p class="text-slate-400 text-sm">Diagnostiqué en 2018. Crises occasionnelles.</p>
+</div>
+</div>
+<!-- History Item 2 -->
+<div class="group flex items-center gap-4 p-3 rounded-lg hover:bg-[#273645] transition-colors cursor-pointer border-b border-[#273645]/50 last:border-0">
+<div class="size-10 rounded-lg bg-purple-500/10 flex items-center justify-center shrink-0 text-purple-400 group-hover:bg-purple-500 group-hover:text-white transition-colors">
+<span class="material-symbols-outlined">vaccines</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between mb-1">
+<h4 class="text-white font-medium text-base">Vaccination Tétanos</h4>
+<span class="text-xs bg-slate-700 text-slate-300 px-2 py-0.5 rounded">À jour</span>
+</div>
+<p class="text-slate-400 text-sm">Dernier rappel: 12 Jan 2023.</p>
+</div>
+</div>
+<!-- History Item 3 (Note) -->
+<div class="group flex items-center gap-4 p-3 rounded-lg hover:bg-[#273645] transition-colors cursor-pointer border-b border-[#273645]/50 last:border-0">
+<div class="size-10 rounded-lg bg-yellow-500/10 flex items-center justify-center shrink-0 text-yellow-400 group-hover:bg-yellow-500 group-hover:text-white transition-colors">
+<span class="material-symbols-outlined">sticky_note_2</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between mb-1">
+<h4 class="text-white font-medium text-base">Note Clinique</h4>
+<span class="text-xs text-slate-500">Hier</span>
+</div>
+<p class="text-slate-400 text-sm line-clamp-2">Patient se plaint de légers maux de tête. Observation recommandée pour les prochaines 24h.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- RIGHT COLUMN: Contacts & Treatments (3 cols) -->
+<div class="lg:col-span-3 flex flex-col gap-6">
+<!-- Action Buttons -->
+<div class="grid grid-cols-2 gap-3">
+<button class="bg-[#273645] hover:bg-[#324558] text-white py-3 rounded-lg font-medium text-sm transition-colors border border-slate-600 flex flex-col items-center justify-center gap-1">
+<span class="material-symbols-outlined">edit_document</span>
+                        Éditer
+                    </button>
+<button class="bg-[#273645] hover:bg-[#324558] text-white py-3 rounded-lg font-medium text-sm transition-colors border border-slate-600 flex flex-col items-center justify-center gap-1">
+<span class="material-symbols-outlined">picture_as_pdf</span>
+                        Exporter
+                    </button>
+</div>
+<!-- Active Treatments -->
+<div class="bg-surface-dark rounded-xl border border-[#273645] p-5">
+<h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">pill</span>
+                        Traitements Actifs
+                    </h3>
+<ul class="space-y-3">
+<li class="flex items-start gap-3 pb-3 border-b border-[#273645] last:border-0">
+<div class="mt-0.5">
+<span class="material-symbols-outlined text-green-400 text-[18px]">check_circle</span>
+</div>
+<div>
+<p class="text-white font-medium">Ventoline 100µg</p>
+<p class="text-xs text-slate-400">2 bouffées si besoin</p>
+</div>
+</li>
+<li class="flex items-start gap-3 pb-3 border-b border-[#273645] last:border-0">
+<div class="mt-0.5">
+<span class="material-symbols-outlined text-green-400 text-[18px]">check_circle</span>
+</div>
+<div>
+<p class="text-white font-medium">Paracétamol 1g</p>
+<p class="text-xs text-slate-400">Toutes les 6h (Douleur)</p>
+</div>
+</li>
+</ul>
+</div>
+<!-- Emergency Contact -->
+<div class="bg-primary/20 rounded-xl border border-primary/40 p-5">
+<h3 class="text-sm font-bold text-primary-200 uppercase tracking-wider mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined">contact_phone</span>
+                        Contact Urgence
+                    </h3>
+<div class="flex flex-col gap-4">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-[#273645] flex items-center justify-center text-slate-300">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div>
+<p class="text-white font-bold text-lg">Moussa Sylla</p>
+<p class="text-sm text-primary-200">Père</p>
+</div>
+</div>
+<a class="flex items-center justify-center gap-2 bg-primary hover:bg-blue-600 text-white py-3 rounded-lg font-bold transition-colors shadow-lg shadow-blue-900/20" href="tel:+221770000000">
+<span class="material-symbols-outlined">call</span>
+                            Appeler (+221 77...)
+                        </a>
+</div>
+</div>
+<!-- Footer Info -->
+<div class="mt-auto text-center">
+<p class="text-xs text-slate-500">Dernière mise à jour</p>
+<p class="text-xs text-slate-400 font-medium">Aujourd'hui, 14:30 par Dr. Diop</p>
+</div>
+</div>
+</div>
+</main>
+</body></html>
