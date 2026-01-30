@@ -1,3 +1,5 @@
+import 'package:afya_id/domain/domain.dart';
+import 'package:afya_id/ui/views/emergency/biometric_scan_view.dart';
 import 'package:flutter/material.dart';
 import 'package:afya_id/ui/styles/app_colors.dart';
 import 'package:go_router/go_router.dart';
@@ -233,7 +235,14 @@ class _EmergencyDashboardState extends State<EmergencyDashboard>
             Icons.face_rounded,
             'Reconnaissance Faciale',
             'Identifier via scan biométrique',
-            onTap: () => context.push(RoutesPaths.biometricScan, extra: true),
+            onTap: () {
+              NavigationUtils().pagePush(
+                context,
+                BiometricScanView(isFace: true),
+              );
+            },
+            // onTap: () =>
+            //     context.pushNamed(RoutesPaths.biometricScan, extra: true),
           ),
         ),
         const SizedBox(width: 24),
@@ -242,7 +251,14 @@ class _EmergencyDashboardState extends State<EmergencyDashboard>
             Icons.fingerprint_rounded,
             'Empreinte Digitale',
             'Scanner l\'index ou le pouce',
-            onTap: () => context.push(RoutesPaths.biometricScan, extra: false),
+            onTap: () {
+              NavigationUtils().pagePush(
+                context,
+                BiometricScanView(isFace: false),
+              );
+            },
+            // onTap: () =>
+            //     context.pushNamed(RoutesPaths.biometricScan, extra: false),
           ),
         ),
       ],

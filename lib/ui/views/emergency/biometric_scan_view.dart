@@ -52,10 +52,7 @@ class _BiometricScanViewState extends State<BiometricScanView>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        foregroundColor: Colors.white,
         title: Text(
           widget.isFace ? 'RECONNAISSANCE FACIALE' : 'SCAN EMPREINTE DIGITALE',
           style: const TextStyle(
@@ -78,11 +75,7 @@ class _BiometricScanViewState extends State<BiometricScanView>
               widget.isFace
                   ? 'Veuillez placer le visage du patient dans le cadre.'
                   : 'Veuillez placer le doigt sur le lecteur USB.',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-              ),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
               textAlign: TextAlign.center,
             ),
           ),
@@ -176,7 +169,7 @@ class _BiometricScanViewState extends State<BiometricScanView>
               border: Border.all(
                 color: _hasResult
                     ? Colors.green
-                    : Colors.white.withValues(alpha: 0.2),
+                    : Theme.of(context).colorScheme.primary,
                 width: 2,
               ),
               borderRadius: BorderRadius.circular(widget.isFace ? 140 : 24),
@@ -196,7 +189,7 @@ class _BiometricScanViewState extends State<BiometricScanView>
                 : Icons.fingerprint_rounded,
             color: _hasResult
                 ? Colors.green
-                : Colors.white.withValues(alpha: 0.1),
+                : Theme.of(context).colorScheme.primary,
             size: 140,
           ),
           // Scan Line

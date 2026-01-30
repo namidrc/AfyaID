@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "9682853479",
+    "project_id": "afya-id",
+    "storage_bucket": "afya-id.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:9682853479:android:79bf4034b7a4b0a1d93ec2",
+        "android_client_info": {
+          "package_name": "com.example.afya_id"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBa5m_pIIP86UWOBmUKelfLE_CJZPCJg5A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
