@@ -1,5 +1,6 @@
 import 'package:afya_id/ui/views/emergency/emergency_dashboard.dart';
 import 'package:afya_id/ui/views/journal/consultation_journal.dart';
+import 'package:afya_id/ui/views/patient/patient_vital_card.dart';
 import 'package:afya_id/ui/views/views.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -20,7 +21,7 @@ enum Genre { M, F }
 enum AppPages {
   emergency('Emergency', EmergencyDashboard()),
   addPatient('AddPatient', RegistrationForm()),
-  docPatient('DocPatient', PatientVitalCard(id: '12345')),
+  docPatient('DocPatient', PatientVitalCard()),
   consultation('Consultation', ConsultationJournal()),
   journalAudit('JournalAudit', AuditLogs());
 

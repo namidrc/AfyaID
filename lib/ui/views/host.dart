@@ -169,9 +169,9 @@ class HostPage extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
+        spacing: 12,
         children: [
           Container(
-            padding: const EdgeInsets.all(2),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
@@ -187,7 +187,6 @@ class HostPage extends StatelessWidget {
             ),
           ),
           if (!collapsed) ...[
-            const SizedBox(width: 12),
             const Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -244,18 +243,27 @@ class HostPage extends StatelessWidget {
               : null,
         ),
         child: Row(
+          spacing: 16,
           mainAxisAlignment: collapsed
               ? MainAxisAlignment.center
               : MainAxisAlignment.start,
           children: [
-            Icon(icon, color: active ? Colors.white : Colors.grey, size: 24),
+            Expanded(
+              child: Icon(
+                icon,
+                color: active ? Colors.white : Colors.grey,
+                size: 24,
+              ),
+            ),
             if (!collapsed) ...[
-              const SizedBox(width: 16),
-              Text(
-                label,
-                style: TextStyle(
-                  color: active ? Colors.white : Colors.grey,
-                  fontWeight: active ? FontWeight.bold : FontWeight.w500,
+              Expanded(
+                flex: 4,
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    color: active ? Colors.white : Colors.grey,
+                    fontWeight: active ? FontWeight.bold : FontWeight.w500,
+                  ),
                 ),
               ),
             ],

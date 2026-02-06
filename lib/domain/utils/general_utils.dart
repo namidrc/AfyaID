@@ -35,7 +35,7 @@ class GeneralUtils {
       onTapOutside: (event) => FocusScope.of(context).unfocus(),
       onChanged: (value) {
         // provider.recharge(searchBarController);
-        onChanged?.call("");
+        onChanged?.call(value);
       },
 
       controller: searchBarController,

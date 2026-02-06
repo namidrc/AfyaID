@@ -1,9 +1,322 @@
 import 'package:flutter/material.dart';
 import 'package:afya_id/ui/styles/app_colors.dart';
+import 'package:afya_id/domain/utils/general_utils.dart';
 
-class PatientVitalCard extends StatelessWidget {
+// Local Patient Model
+class Patient {
   final String id;
-  const PatientVitalCard({super.key, required this.id});
+  final String firstName;
+  final String lastName;
+  final int age;
+  final String gender;
+  final String location;
+  final String imageUrl;
+  final String bloodGroup;
+  final String allergy;
+
+  Patient({
+    required this.id,
+    required this.firstName,
+    required this.lastName,
+    required this.age,
+    required this.gender,
+    required this.location,
+    required this.imageUrl,
+    required this.bloodGroup,
+    required this.allergy,
+  });
+}
+
+class PatientVitalCard extends StatefulWidget {
+  final String? initialPatientId;
+  const PatientVitalCard({super.key, this.initialPatientId});
+
+  @override
+  State<PatientVitalCard> createState() => _PatientVitalCardState();
+}
+
+class _PatientVitalCardState extends State<PatientVitalCard> {
+  String? _selectedPatientId;
+  final TextEditingController _searchController = TextEditingController();
+  List<Patient> _filteredPatients = [];
+
+  // Mock Data
+  final List<Patient> _allPatients = [
+    Patient(
+      id: "456789",
+      firstName: "Amara",
+      lastName: "Sylla",
+      age: 34,
+      gender: "HOMME",
+      location: "Camp Goma, Zone B",
+      imageUrl:
+          'https://lh3.googleusercontent.com/aida-public/AB6AXuDzIGuNmpl9JKMsc3vh03Ycrp_KKvhdoNpbLai-M2vEyU34uRFGRAhxiiJyMcGQ99a0LRaaKO4XAWY7jN53U4SqSwp2_c8jhkJDGDx92xDuDxfxm0GFbNn3htU7LkF6vI7ejg9uEx5oZXwgsIcFQgMTYlrJla7Z5rKMnv9LHvS-kHIIWM4a6XNUm9qdVrDWGq7ZpRe90yOCaXGTV3At4KWyRrP29IPjBzvQPTYRCAt_MIzfMRJYSRLms1gwE51BxaXZwdad8oV7jn4',
+      bloodGroup: "O+",
+      allergy: "ARACHIDES",
+    ),
+    Patient(
+      id: "123456",
+      firstName: "Fatou",
+      lastName: "Diallo",
+      age: 25,
+      gender: "FEMME",
+      location: "Kinshasa, Gombe",
+      imageUrl:
+          'https://img.freepik.com/photos-gratuite/portrait-jeune-femme-africaine-souriante_23-2148747761.jpg',
+      bloodGroup: "A+",
+      allergy: "AUCUNE",
+    ),
+    Patient(
+      id: "789012",
+      firstName: "Jean",
+      lastName: "Kambale",
+      age: 42,
+      gender: "HOMME",
+      location: "Lubumbashi, Centre",
+      imageUrl:
+          'https://img.freepik.com/photos-gratuite/portrait-homme-africain-souriant-lunettes_23-2148747768.jpg',
+      bloodGroup: "B-",
+      allergy: "PENICILLINE",
+    ),
+    Patient(
+      id: "345678",
+      firstName: "Marie",
+      lastName: "Mukuna",
+      age: 60,
+      gender: "FEMME",
+      location: "Goma, Katindo",
+      imageUrl:
+          'https://img.freepik.com/photos-gratuite/portrait-femme-africaine-agee-souriante_23-2148747775.jpg',
+      bloodGroup: "AB+",
+      allergy: "POUSSIÈRE",
+    ),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedPatientId = widget.initialPatientId;
+    _filteredPatients = _allPatients;
+  }
+
+  void _filterPatients(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _filteredPatients = _allPatients;
+      } else {
+        _filteredPatients = _allPatients.where((patient) {
+          final fullName = "${patient.firstName} ${patient.lastName}"
+              .toLowerCase();
+          return fullName.contains(query.toLowerCase()) ||
+              patient.id.contains(query);
+        }).toList();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_selectedPatientId != null) {
+      final patient = _allPatients.firstWhere(
+        (p) => p.id == _selectedPatientId,
+        orElse: () => _allPatients.first, // Fallback
+      );
+      return _PatientDetailsView(
+        patient: patient,
+        onBack: () {
+          setState(() {
+            _selectedPatientId = null;
+          });
+        },
+      );
+    }
+    return _buildPatientList(context);
+  }
+
+  Widget _buildPatientList(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1000),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Liste des Patients",
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  // color: AppColors.patientBlue,
+                ),
+              ),
+              const SizedBox(height: 24),
+              GeneralUtils().generalSearchBar(
+                context,
+                searchBarController: _searchController,
+                onChanged: _filterPatients,
+              ),
+              const SizedBox(height: 24),
+              if (_filteredPatients.isEmpty)
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(40.0),
+                    child: Text(
+                      "Aucun patient trouvé.",
+                      style: TextStyle(color: AppColors.grey),
+                    ),
+                  ),
+                )
+              else
+                ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: _filteredPatients.length,
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 16),
+                  itemBuilder: (context, index) {
+                    final patient = _filteredPatients[index];
+                    return _buildPatientListItem(context, patient);
+                  },
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPatientListItem(BuildContext context, Patient patient) {
+    return GeneralUtils().generalButton(
+      padding: EdgeInsets.zero,
+      backColor: Theme.of(context).colorScheme.surface,
+      radius: 16,
+      tapAction: () {
+        setState(() {
+          _selectedPatientId = patient.id;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.grey.withValues(alpha: 0.3)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                image: DecorationImage(
+                  image: NetworkImage(patient.imageUrl),
+                  fit: BoxFit.cover,
+                  onError: (exception, stackTrace) {
+                    // Fallback if image fails
+                  },
+                ),
+                color: AppColors.grey2,
+              ),
+              // Fallback icon if needed could be handled here or with errorBuilder
+              child: null,
+            ),
+            const SizedBox(width: 20),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "${patient.firstName} ${patient.lastName}",
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      _buildMiniPill(patient.gender),
+                      const SizedBox(width: 8),
+                      Text(
+                        "${patient.age} ANS",
+                        style: const TextStyle(
+                          color: AppColors.grey,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  "ID: #${patient.id}",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.patientBlue,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Icon(Icons.location_on, size: 14, color: AppColors.grey),
+                    const SizedBox(width: 4),
+                    Text(
+                      patient.location,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(width: 16),
+            const Icon(
+              Icons.arrow_forward_ios,
+              size: 16,
+              color: AppColors.grey,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMiniPill(String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: AppColors.grey.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+}
+
+// ORIGINAL CONTENT REFACTORED INTO A STATLESS WIDGET FOR DETAILS
+
+class _PatientDetailsView extends StatelessWidget {
+  final Patient patient;
+  final VoidCallback onBack;
+
+  const _PatientDetailsView({required this.patient, required this.onBack});
 
   @override
   Widget build(BuildContext context) {
@@ -53,10 +366,25 @@ class PatientVitalCard extends StatelessWidget {
   Widget _buildBreadcrumb(BuildContext context) {
     return Row(
       children: [
-        Text('Accueil', style: TextStyle(color: AppColors.grey, fontSize: 13)),
+        GeneralUtils().generalButton(
+          padding: EdgeInsets.symmetric(horizontal: 4),
+          radius: 16,
+          tapAction: onBack,
+          child: Row(
+            children: [
+              const Icon(Icons.arrow_back, size: 16, color: AppColors.grey),
+              const SizedBox(width: 4),
+              Text(
+                'Liste Patients',
+                style: TextStyle(color: AppColors.grey, fontSize: 13),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 8),
         const Icon(Icons.chevron_right, size: 16, color: AppColors.grey),
         Text(
-          'Fiche Patient #$id',
+          'Fiche Patient #${patient.id}',
           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
         ),
         const Spacer(),
@@ -134,10 +462,8 @@ class PatientVitalCard extends StatelessWidget {
                             color: AppColors.grey2,
                             // borderRadius: BorderRadius.circular(12),
                             shape: BoxShape.circle,
-                            image: const DecorationImage(
-                              image: NetworkImage(
-                                'https://lh3.googleusercontent.com/aida-public/AB6AXuDzIGuNmpl9JKMsc3vh03Ycrp_KKvhdoNpbLai-M2vEyU34uRFGRAhxiiJyMcGQ99a0LRaaKO4XAWY7jN53U4SqSwp2_c8jhkJDGDx92xDuDxfxm0GFbNn3htU7LkF6vI7ejg9uEx5oZXwgsIcFQgMTYlrJla7Z5rKMnv9LHvS-kHIIWM4a6XNUm9qdVrDWGq7ZpRe90yOCaXGTV3At4KWyRrP29IPjBzvQPTYRCAt_MIzfMRJYSRLms1gwE51BxaXZwdad8oV7jn4',
-                              ),
+                            image: DecorationImage(
+                              image: NetworkImage(patient.imageUrl),
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -164,9 +490,9 @@ class PatientVitalCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Amara Sylla',
-                            style: TextStyle(
+                          Text(
+                            '${patient.firstName} ${patient.lastName}',
+                            style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
                             ),
@@ -180,7 +506,7 @@ class PatientVitalCard extends StatelessWidget {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                'ID: #$id-AFY',
+                                'ID: #${patient.id}-AFY',
                                 style: const TextStyle(
                                   color: AppColors.grey,
                                   fontSize: 13,
@@ -191,9 +517,9 @@ class PatientVitalCard extends StatelessWidget {
                           const SizedBox(height: 8),
                           Row(
                             children: [
-                              _buildPill('34 ANS'),
+                              _buildPill('${patient.age} ANS'),
                               const SizedBox(width: 8),
-                              _buildPill('HOMME'),
+                              _buildPill(patient.gender),
                             ],
                           ),
                         ],
@@ -205,13 +531,13 @@ class PatientVitalCard extends StatelessWidget {
                 Row(
                   children: [
                     Expanded(
-                      child: _buildInfoItem('DATE DE NAISSANCE', '12 Mai 1989'),
+                      child: _buildInfoItem(
+                        'DATE DE NAISSANCE',
+                        '12 Mai 1989',
+                      ), // Placeholder, logic can be added
                     ),
                     Expanded(
-                      child: _buildInfoItem(
-                        'LOCALISATION',
-                        'Camp Goma, Zone B',
-                      ),
+                      child: _buildInfoItem('LOCALISATION', patient.location),
                     ),
                   ],
                 ),
@@ -431,7 +757,7 @@ class PatientVitalCard extends StatelessWidget {
             Expanded(
               child: _buildCriticalCard(
                 'GROUPE SANGUIN',
-                'O+',
+                patient.bloodGroup,
                 Colors.redAccent,
                 Icons.bloodtype,
               ),
@@ -440,7 +766,7 @@ class PatientVitalCard extends StatelessWidget {
             Expanded(
               child: _buildCriticalCard(
                 'ALLERGIE SÉVÈRE',
-                'ARACHIDES',
+                patient.allergy,
                 AppColors.surfacePatientDark,
                 Icons.warning_rounded,
                 isAllergy: true,
@@ -801,30 +1127,19 @@ class PatientVitalCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Moussa Sylla',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    "Dr. Kakule", // Mocked data
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
                   ),
                   Text(
-                    'Père',
-                    style: TextStyle(color: AppColors.grey, fontSize: 12),
+                    "+243 999 123 456", // Mocked data
+                    style: const TextStyle(color: AppColors.grey, fontSize: 12),
                   ),
                 ],
               ),
             ],
-          ),
-          const SizedBox(height: 20),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () {},
-              icon: const Icon(Icons.call),
-              label: const Text('APPELER (+221 77...)'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.patientBlue,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-              ),
-            ),
           ),
         ],
       ),
