@@ -82,6 +82,12 @@ class HostPage extends StatelessWidget {
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               children: AppPages.values
+                  .where(
+                    (value) => provider.userModel == null
+                        ? (value == AppPages.emergency ||
+                              value == AppPages.profile)
+                        : true,
+                  )
                   .map(
                     (page) => _buildNavItem(
                       context,

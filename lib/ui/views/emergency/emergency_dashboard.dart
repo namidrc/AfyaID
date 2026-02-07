@@ -1,11 +1,12 @@
 import 'package:afya_id/domain/domain.dart';
+import 'package:afya_id/ui/providers/general_provider.dart';
 import 'package:afya_id/ui/views/emergency/biometric_scan_view.dart';
+import 'package:afya_id/ui/views/patient/patient_vital_card.dart';
 import 'package:flutter/material.dart';
 import 'package:afya_id/ui/styles/app_colors.dart';
-import 'package:go_router/go_router.dart';
-import 'package:afya_id/domain/routes/routes_paths.dart';
 import 'package:afya_id/data/models/patient_model.dart';
 import 'package:afya_id/data/services/patient_firestore_service.dart';
+import 'package:provider/provider.dart';
 
 class EmergencyDashboard extends StatefulWidget {
   const EmergencyDashboard({super.key});
@@ -21,7 +22,6 @@ class _EmergencyDashboardState extends State<EmergencyDashboard>
   final PatientFirestoreService _patientService = PatientFirestoreService();
   List<PatientModel> _searchResults = [];
   bool _showSearchResults = false;
-  String? _selectedPatientId;
 
   @override
   void initState() {
@@ -68,11 +68,6 @@ class _EmergencyDashboardState extends State<EmergencyDashboard>
 
   @override
   Widget build(BuildContext context) {
-    // Si un patient est sélectionné, afficher ses détails
-    if (_selectedPatientId != null) {
-      return _buildPatientDetailsView();
-    }
-
     // Sinon, afficher le tableau de bord d'urgence
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
@@ -82,12 +77,16 @@ class _EmergencyDashboardState extends State<EmergencyDashboard>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildSearchBar(context),
               const SizedBox(height: 20),
+
+              _buildTitleArea(context),
+              const SizedBox(height: 20),
+              _buildSearchBar(context),
+              const SizedBox(height: 10),
+
               if (_showSearchResults && _searchResults.isNotEmpty)
-                _buildSearchResultsList()
+                _buildSearchResultsList(context)
               else ...[
-                _buildTitleArea(context),
                 const SizedBox(height: 60),
                 _buildMainScanButton(context),
                 const SizedBox(height: 80),
@@ -140,7 +139,8 @@ class _EmergencyDashboardState extends State<EmergencyDashboard>
     );
   }
 
-  Widget _buildSearchResultsList() {
+  Widget _buildSearchResultsList(BuildContext context) {
+    final provider = Provider.of<GeneralProvider>(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -157,9 +157,12 @@ class _EmergencyDashboardState extends State<EmergencyDashboard>
           return InkWell(
             onTap: () {
               setState(() {
-                _selectedPatientId = patient.id;
-                _searchController.clear();
-                _showSearchResults = false;
+                NavigationUtils().pagePush(
+                  context,
+                  PatientVitalCard(initialPatientId: patient.id),
+                );
+                // _searchController.clear();
+                // _showSearchResults = false;
               });
             },
             child: Container(
@@ -222,313 +225,6 @@ class _EmergencyDashboardState extends State<EmergencyDashboard>
             ),
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildPatientDetailsView() {
-    return StreamBuilder<PatientModel?>(
-      stream: _patientService.streamPatient(_selectedPatientId!),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (snapshot.hasError || !snapshot.hasData) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text('Erreur de chargement du patient'),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      _selectedPatientId = null;
-                      _searchController.clear();
-                      _showSearchResults = false;
-                    });
-                  },
-                  child: const Text('Retour'),
-                ),
-              ],
-            ),
-          );
-        }
-
-        final patient = snapshot.data!;
-        return SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1200),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      ElevatedButton.icon(
-                        onPressed: () {
-                          setState(() {
-                            _selectedPatientId = null;
-                            _searchController.clear();
-                          });
-                        },
-                        icon: const Icon(Icons.arrow_back),
-                        label: const Text('Retour à la recherche'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryTeal,
-                          foregroundColor: Colors.white,
-                        ),
-                      ),
-                      const Spacer(),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.green.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: AppColors.green.withValues(alpha: 0.3),
-                          ),
-                        ),
-                        child: const Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 4,
-                              backgroundColor: AppColors.green,
-                            ),
-                            SizedBox(width: 6),
-                            Text(
-                              'EN LIGNE',
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.green,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 32),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Identity Card
-                      Expanded(child: _buildPatientIdentityCard(patient)),
-                      const SizedBox(width: 24),
-                      // Blood Group & Allergy Cards
-                      Expanded(
-                        child: Column(
-                          children: [
-                            _buildCriticalInfoCard(
-                              'Groupe Sanguin',
-                              patient.bloodGroup,
-                              AppColors.patientBlue,
-                              Icons.bloodtype,
-                            ),
-                            const SizedBox(height: 16),
-                            _buildCriticalInfoCard(
-                              'Allergies',
-                              patient.allergy,
-                              Colors.red.withValues(alpha: 0.1),
-                              Icons.warning,
-                              isAlert: true,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  // Chronic Conditions
-                  if (patient.chronicConditions.isNotEmpty)
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surface,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: Colors.grey.withValues(alpha: 0.2),
-                        ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Conditions Chroniques',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            children: patient.chronicConditions
-                                .map(
-                                  (condition) => Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 6,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.primaryTeal.withValues(
-                                        alpha: 0.1,
-                                      ),
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Text(
-                                      condition,
-                                      style: const TextStyle(
-                                        color: AppColors.primaryTeal,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ),
-                                )
-                                .toList(),
-                          ),
-                        ],
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildPatientIdentityCard(PatientModel patient) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: CircleAvatar(
-              radius: 40,
-              backgroundColor: AppColors.primaryTeal.withValues(alpha: 0.1),
-              child: Text(
-                '${patient.firstName[0]}${patient.lastName[0]}',
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryTeal,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Center(
-            child: Text(
-              patient.fullName,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-          ),
-          const SizedBox(height: 4),
-          Center(
-            child: Text(
-              'ID: ${patient.id}',
-              style: const TextStyle(color: Colors.grey, fontSize: 12),
-            ),
-          ),
-          const SizedBox(height: 20),
-          _buildInfoRow('Âge', '${patient.age} ans'),
-          const SizedBox(height: 12),
-          _buildInfoRow('Genre', patient.gender == 'M' ? 'Homme' : 'Femme'),
-          const SizedBox(height: 12),
-          _buildInfoRow('Localisation', patient.location),
-          const SizedBox(height: 12),
-          _buildInfoRow('ID National', patient.nationalId),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInfoRow(String label, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            color: Colors.grey.withValues(alpha: 0.7),
-            fontSize: 11,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCriticalInfoCard(
-    String label,
-    String value,
-    Color bgColor,
-    IconData icon, {
-    bool isAlert = false,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(16),
-        border: isAlert
-            ? Border.all(color: Colors.red, width: 2)
-            : Border.all(color: Colors.grey.withValues(alpha: 0.2)),
-        boxShadow: [
-          BoxShadow(
-            color: bgColor.withValues(alpha: 0.2),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(icon, color: isAlert ? Colors.red : AppColors.primaryTeal),
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: isAlert
-                      ? Colors.red
-                      : Colors.grey.withValues(alpha: 0.7),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            value,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-        ],
       ),
     );
   }
@@ -657,9 +353,9 @@ class _EmergencyDashboardState extends State<EmergencyDashboard>
           ),
           // Button
           GestureDetector(
-            onTap: () => context.push(
-              RoutesPaths.patientRecord.replaceAll(':id', '12345'),
-            ),
+            // onTap: () => context.push(
+            //   RoutesPaths.patientRecord.replaceAll(':id', '12345'),
+            // ),
             child: Container(
               width: 180,
               height: 180,

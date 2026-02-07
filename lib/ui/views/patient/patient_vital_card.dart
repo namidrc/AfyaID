@@ -1,9 +1,11 @@
+import 'package:afya_id/domain/utils/date_util.dart';
 import 'package:flutter/material.dart';
 import 'package:afya_id/ui/styles/app_colors.dart';
 import 'package:afya_id/domain/utils/general_utils.dart';
 import 'package:afya_id/data/models/models.dart';
 import 'package:afya_id/data/services/services.dart';
 import 'package:afya_id/ui/views/registration/registration_form.dart';
+import 'package:go_router/go_router.dart';
 
 class PatientVitalCard extends StatefulWidget {
   final String? initialPatientId;
@@ -42,30 +44,33 @@ class _PatientVitalCardState extends State<PatientVitalCard> {
   @override
   Widget build(BuildContext context) {
     if (_selectedPatientId != null) {
-      return StreamBuilder<PatientModel?>(
-        stream: _patientService.streamPatient(_selectedPatientId!),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      return Scaffold(
+        appBar: context.canPop() ? AppBar() : null,
+        body: StreamBuilder<PatientModel?>(
+          stream: _patientService.streamPatient(_selectedPatientId!),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-          if (snapshot.hasError) {
-            return Center(child: Text('Erreur: ${snapshot.error}'));
-          }
+            if (snapshot.hasError) {
+              return Center(child: Text('Erreur: ${snapshot.error}'));
+            }
 
-          if (!snapshot.hasData || snapshot.data == null) {
-            return const Center(child: Text('Patient non trouvé'));
-          }
+            if (!snapshot.hasData || snapshot.data == null) {
+              return const Center(child: Text('Patient non trouvé'));
+            }
 
-          return _PatientDetailsView(
-            patient: snapshot.data!,
-            onBack: () {
-              setState(() {
-                _selectedPatientId = null;
-              });
-            },
-          );
-        },
+            return _PatientDetailsView(
+              patient: snapshot.data!,
+              onBack: () {
+                setState(() {
+                  _selectedPatientId = null;
+                });
+              },
+            );
+          },
+        ),
       );
     }
     return _buildPatientList(context);
@@ -201,7 +206,7 @@ class _PatientVitalCardState extends State<PatientVitalCard> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    "${patient.age} ans • ${patient.gender}",
+                    "${calculateAge(patient.dateOfBirth)} ans • ${patient.gender}",
                     style: TextStyle(color: AppColors.grey, fontSize: 14),
                   ),
                   const SizedBox(height: 4),
@@ -301,15 +306,17 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1400),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildBreadcrumb(context),
-              const SizedBox(height: 24),
+              if (!context.canPop()) ...[
+                _buildBreadcrumb(context),
+                const SizedBox(height: 24),
+              ],
               LayoutBuilder(
                 builder: (context, constraints) {
                   if (constraints.maxWidth > 1000) {
@@ -347,16 +354,17 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
     return Row(
       children: [
         GeneralUtils().generalButton(
-          padding: EdgeInsets.symmetric(horizontal: 4),
+          backColor: Theme.of(context).colorScheme.primary,
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           radius: 16,
           tapAction: widget.onBack,
           child: Row(
+            spacing: 4,
             children: [
-              const Icon(Icons.arrow_back, size: 16, color: AppColors.grey),
-              const SizedBox(width: 4),
+              const Icon(Icons.arrow_back, size: 16, color: AppColors.white0),
               Text(
                 'Liste Patients',
-                style: TextStyle(color: AppColors.grey, fontSize: 13),
+                style: TextStyle(color: AppColors.white0, fontWeight: .bold),
               ),
             ],
           ),
@@ -403,9 +411,17 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
 
   Widget _buildLeftColumn(BuildContext context) {
     return Column(
+      spacing: 24,
       children: [
         _buildIdentityCard(context),
-        const SizedBox(height: 24),
+
+        _buildCriticalCard(
+          'ALLERGIE SÉVÈRE',
+          widget.patient.allergy.isEmpty ? "Aucune" : widget.patient.allergy,
+          AppColors.surfacePatientDark,
+          Icons.warning_rounded,
+          isAllergy: true,
+        ),
         _buildVitalsCard(context),
       ],
     );
@@ -486,7 +502,7 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                'ID: #${widget.patient.id}-AFY',
+                                'ID: #${widget.patient.id}',
                                 style: const TextStyle(
                                   color: AppColors.grey,
                                   fontSize: 13,
@@ -497,7 +513,9 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
                           const SizedBox(height: 8),
                           Row(
                             children: [
-                              _buildPill('${widget.patient.age} ANS'),
+                              _buildPill(
+                                '${calculateAge(widget.patient.dateOfBirth)} ANS',
+                              ),
                               const SizedBox(width: 8),
                               _buildPill(widget.patient.gender),
                             ],
@@ -513,7 +531,7 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
                     Expanded(
                       child: _buildInfoItem(
                         'DATE DE NAISSANCE',
-                        '12 Mai 1989',
+                        DateUtil.dateFormatter(widget.patient.dateOfBirth),
                       ), // Placeholder, logic can be added
                     ),
                     Expanded(
@@ -735,29 +753,23 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
   Widget _buildCenterColumn(BuildContext context) {
     return Column(
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: _buildCriticalCard(
-                'GROUPE SANGUIN',
-                widget.patient.bloodGroup,
-                Colors.redAccent,
-                Icons.bloodtype,
+        IntrinsicHeight(
+          child: Row(
+            spacing: 16,
+            children: [
+              Expanded(
+                child: _buildCriticalCard(
+                  'GROUPE SANGUIN',
+                  widget.patient.bloodGroup,
+                  Colors.redAccent,
+                  Icons.bloodtype,
+                ),
               ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _buildCriticalCard(
-                'ALLERGIE SÉVÈRE',
-                widget.patient.allergy,
-                AppColors.surfacePatientDark,
-                Icons.warning_rounded,
-                isAllergy: true,
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
         const SizedBox(height: 24),
+
         _buildMedicalHistory(context),
       ],
     );
@@ -771,8 +783,8 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
     bool isAllergy = false,
   }) {
     return Container(
-      height: 120,
       padding: const EdgeInsets.all(20),
+      width: .maxFinite,
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(16),

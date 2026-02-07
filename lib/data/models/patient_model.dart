@@ -5,7 +5,6 @@ class PatientModel {
   final String id;
   final String firstName;
   final String lastName;
-  final int age;
   final String gender; // HOMME, FEMME
   final String location;
   final String imageUrl;
@@ -22,7 +21,6 @@ class PatientModel {
     required this.id,
     required this.firstName,
     required this.lastName,
-    required this.age,
     required this.gender,
     required this.location,
     required this.imageUrl,
@@ -44,7 +42,6 @@ class PatientModel {
       'id': id,
       'firstName': firstName,
       'lastName': lastName,
-      'age': age,
       'gender': gender,
       'location': location,
       'imageUrl': imageUrl,
@@ -65,7 +62,6 @@ class PatientModel {
       id: doc.id,
       firstName: data['firstName'] ?? '',
       lastName: data['lastName'] ?? '',
-      age: data['age'] ?? 0,
       gender: data['gender'] ?? 'HOMME',
       location: data['location'] ?? '',
       imageUrl: data['imageUrl'] ?? '',
@@ -87,7 +83,6 @@ class PatientModel {
     String? id,
     String? firstName,
     String? lastName,
-    int? age,
     String? gender,
     String? location,
     String? imageUrl,
@@ -104,7 +99,6 @@ class PatientModel {
       id: id ?? this.id,
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,
-      age: age ?? this.age,
       gender: gender ?? this.gender,
       location: location ?? this.location,
       imageUrl: imageUrl ?? this.imageUrl,

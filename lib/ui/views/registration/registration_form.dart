@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:afya_id/ui/styles/app_colors.dart';
 import 'package:afya_id/data/models/patient_model.dart';
 import 'package:afya_id/data/services/patient_firestore_service.dart';
+import 'package:go_router/go_router.dart';
 
 class RegistrationForm extends StatefulWidget {
   final PatientModel? patientToEdit;
@@ -20,6 +21,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
   List<String> _chronicConditions = [];
   bool _consentChecked = false;
 
+  // Contrôleurs de texte
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
@@ -34,10 +36,10 @@ class _RegistrationFormState extends State<RegistrationForm> {
   @override
   void initState() {
     super.initState();
+    // Valeurs par défaut
     _selectedBloodType = 'A+';
     _selectedGender = 'M';
 
-    // Si on édite un patient existant
     if (widget.patientToEdit != null) {
       _loadPatientData(widget.patientToEdit!);
     }
@@ -47,7 +49,9 @@ class _RegistrationFormState extends State<RegistrationForm> {
     _firstNameController.text = patient.firstName;
     _lastNameController.text = patient.lastName;
     _locationController.text = patient.location;
-    _dateOfBirthController.text = patient.dateOfBirth.toString().split(' ')[0];
+    _dateOfBirthController.text = patient.dateOfBirth.toIso8601String().split(
+      'T',
+    )[0];
     _nationalIdController.text = patient.nationalId;
     _allergiesController.text = patient.allergy;
     _selectedBloodType = patient.bloodGroup;
@@ -68,6 +72,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
   }
 
   Future<void> _savePatient() async {
+    // CORRECTION : Utilisation de "return" pour arrêter l'exécution si validation échoue
     if (_firstNameController.text.isEmpty ||
         _lastNameController.text.isEmpty ||
         _nationalIdController.text.isEmpty) {
@@ -75,28 +80,30 @@ class _RegistrationFormState extends State<RegistrationForm> {
         context,
         text: "Veuillez remplir tous les champs obligatoires",
       );
-      // return;
+      return;
     }
 
     if (!_consentChecked) {
       snackbarMessage(context, text: "Veuillez confirmer le consentement");
-      // return;
+      return;
     }
 
     setState(() => _isLoading = true);
 
     try {
-      final DateTime dateOfBirth =
-          DateTime.tryParse(_dateOfBirthController.text) ?? DateTime.now();
-      final int age = DateTime.now().year - dateOfBirth.year;
+      final DateTime? dateOfBirth = DateTime.tryParse(
+        _dateOfBirthController.text,
+      );
+      if (dateOfBirth == null) {
+        throw "Format de date invalide (AAAA-MM-JJ)";
+      }
 
       final patient = PatientModel(
         id:
             widget.patientToEdit?.id ??
-            DateTime.now().millisecondsSinceEpoch.toString(),
+            "${_firstNameController.text}_${_lastNameController.text}_${DateTime.now().millisecondsSinceEpoch.toString()}-AFY",
         firstName: _firstNameController.text.trim(),
         lastName: _lastNameController.text.trim(),
-        age: age,
         gender: _selectedGender ?? 'M',
         location: _locationController.text.trim(),
         imageUrl: widget.patientToEdit?.imageUrl ?? '',
@@ -112,29 +119,17 @@ class _RegistrationFormState extends State<RegistrationForm> {
       if (widget.patientToEdit != null) {
         await _patientService.updatePatient(patient);
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Patient mis à jour avec succès')),
-          );
+          snackbarMessage(context, text: 'Patient mis à jour avec succès');
         }
       } else {
         await _patientService.createPatient(patient);
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Patient créé avec succès')),
-          );
-        }
+        if (mounted) snackbarMessage(context, text: 'Patient créé avec succès');
         _resetForm();
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Erreur: $e')));
-      }
+      if (mounted) snackbarMessage(context, text: 'Erreur: $e');
     } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -166,42 +161,47 @@ class _RegistrationFormState extends State<RegistrationForm> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1000),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildBreadcrumbs(context),
-              const SizedBox(height: 32),
-              Text(
-                widget.patientToEdit != null
-                    ? 'Modifier Enregistrement'
-                    : 'Nouvel Enregistrement',
-                style: const TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
+    return Scaffold(
+      appBar: context.canPop() ? AppBar() : null,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1000),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildBreadcrumbs(context),
+                const SizedBox(height: 32),
+                Text(
+                  widget.patientToEdit != null
+                      ? 'Modifier Enregistrement'
+                      : 'Nouvel Enregistrement',
+                  style: const TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Inscrire un nouveau patient dans la base de données de santé d\'urgence.',
-                style: TextStyle(color: Colors.grey),
-              ),
-              const SizedBox(height: 40),
-              _buildProgressStepper(context),
-              const SizedBox(height: 32),
-              _buildFormSections(context),
-              const SizedBox(height: 40),
-              _buildConsentAndActions(context),
-            ],
+                const SizedBox(height: 8),
+                const Text(
+                  'Inscrire un nouveau patient dans la base de données de santé d\'urgence.',
+                  style: TextStyle(color: Colors.grey),
+                ),
+                // const SizedBox(height: 40),
+                // _buildProgressStepper(context),
+                const SizedBox(height: 32),
+                _buildFormSections(context),
+                const SizedBox(height: 40),
+                _buildConsentAndActions(context),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
+
+  // --- WIDGETS DE CONSTRUCTION ---
 
   Widget _buildBreadcrumbs(BuildContext context) {
     return Row(
@@ -209,7 +209,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
         Text(
           'Tableau de bord',
           style: TextStyle(
-            color: AppColors.primaryTeal.withValues(alpha: 0.7),
+            color: AppColors.primaryTeal.withOpacity(0.7),
             fontSize: 14,
           ),
         ),
@@ -230,15 +230,14 @@ class _RegistrationFormState extends State<RegistrationForm> {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
+        border: Border.all(color: Colors.grey.withOpacity(0.1)),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
+              const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -247,19 +246,18 @@ class _RegistrationFormState extends State<RegistrationForm> {
                       color: AppColors.primaryTeal,
                       fontWeight: FontWeight.w900,
                       fontSize: 12,
-                      letterSpacing: 1,
                     ),
                   ),
-                  const Text(
+                  Text(
                     'Profil Médical & Biométrie',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
-              const Text(
+              Text(
                 '50% Terminé',
                 style: TextStyle(
-                  color: Colors.grey,
+                  color: Colors.grey.shade600,
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
                 ),
@@ -267,48 +265,11 @@ class _RegistrationFormState extends State<RegistrationForm> {
             ],
           ),
           const SizedBox(height: 16),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: LinearProgressIndicator(
-              value: 0.5,
-              backgroundColor: AppColors.primaryTeal.withValues(alpha: 0.1),
-              color: AppColors.primaryTeal,
-              minHeight: 12,
-            ),
-          ),
-          const SizedBox(height: 12),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'IDENTITÉ',
-                style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
-              ),
-              Text(
-                'PROFIL MÉDICAL',
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryTeal,
-                ),
-              ),
-              Text(
-                'BIOMÉTRIE',
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey,
-                ),
-              ),
-              Text(
-                'RÉVISION',
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey,
-                ),
-              ),
-            ],
+          LinearProgressIndicator(
+            value: 0.5,
+            backgroundColor: AppColors.primaryTeal.withOpacity(0.1),
+            color: AppColors.primaryTeal,
+            minHeight: 8,
           ),
         ],
       ),
@@ -322,34 +283,72 @@ class _RegistrationFormState extends State<RegistrationForm> {
           context,
           icon: Icons.person_rounded,
           title: 'Détails Personnels',
-          child: GridView.count(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: MediaQuery.of(context).size.width > 700 ? 2 : 1,
-            mainAxisSpacing: 24,
-            crossAxisSpacing: 24,
-            childAspectRatio: 3.5,
-            children: [
-              _buildTextField('Prénom', 'p.ex. John', _firstNameController),
-              _buildTextField('Nom', 'p.ex. Doe', _lastNameController),
-              _buildTextField(
-                'Date de Naissance',
-                'JJ/MM/AAAA',
-                isDate: true,
-                _dateOfBirthController,
-              ),
-              _buildDropdownField('Genre', ['M', 'F']),
-              _buildTextField(
-                'Numéro d\'ID National',
-                'ID-000-000-000',
-                _nationalIdController,
-              ),
-              _buildTextField(
-                'Localisation',
-                'p.ex. Kinshasa',
-                _locationController,
-              ),
-            ],
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return Wrap(
+                spacing: 24,
+                runSpacing: 24,
+                children: [
+                  SizedBox(
+                    width: constraints.maxWidth > 600
+                        ? (constraints.maxWidth / 2) - 12
+                        : constraints.maxWidth,
+                    child: _buildTextField(
+                      'Prénom',
+                      'p.ex. John',
+                      _firstNameController,
+                    ),
+                  ),
+                  SizedBox(
+                    width: constraints.maxWidth > 600
+                        ? (constraints.maxWidth / 2) - 12
+                        : constraints.maxWidth,
+                    child: _buildTextField(
+                      'Nom',
+                      'p.ex. Doe',
+                      _lastNameController,
+                    ),
+                  ),
+                  SizedBox(
+                    width: constraints.maxWidth > 600
+                        ? (constraints.maxWidth / 2) - 12
+                        : constraints.maxWidth,
+                    child: _buildTextField(
+                      'Date de Naissance',
+                      'AAAA-MM-JJ',
+                      _dateOfBirthController,
+                      isDate: true,
+                    ),
+                  ),
+                  SizedBox(
+                    width: constraints.maxWidth > 600
+                        ? (constraints.maxWidth / 2) - 12
+                        : constraints.maxWidth,
+                    child: _buildDropdownField('Genre', ['M', 'F']),
+                  ),
+                  SizedBox(
+                    width: constraints.maxWidth > 600
+                        ? (constraints.maxWidth / 2) - 12
+                        : constraints.maxWidth,
+                    child: _buildTextField(
+                      'ID National',
+                      'ID-000-000',
+                      _nationalIdController,
+                    ),
+                  ),
+                  SizedBox(
+                    width: constraints.maxWidth > 600
+                        ? (constraints.maxWidth / 2) - 12
+                        : constraints.maxWidth,
+                    child: _buildTextField(
+                      'Localisation',
+                      'Kinshasa',
+                      _locationController,
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
         ),
         const SizedBox(height: 32),
@@ -362,29 +361,25 @@ class _RegistrationFormState extends State<RegistrationForm> {
             children: [
               const Text(
                 'Groupe Sanguin',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
               Wrap(
                 spacing: 8,
-                runSpacing: 8,
                 children: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
                     .map((type) {
-                      final bool selected = _selectedBloodType == type;
                       return ChoiceChip(
-                        label: Text(
-                          type,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: selected ? AppColors.white0 : null,
-                          ),
-                        ),
-                        checkmarkColor: AppColors.white0,
-
-                        selected: selected,
+                        label: Text(type),
+                        selected: _selectedBloodType == type,
                         onSelected: (val) =>
                             setState(() => _selectedBloodType = type),
+                        checkmarkColor: AppColors.white0,
                         selectedColor: AppColors.primaryTeal,
+                        labelStyle: TextStyle(
+                          color: _selectedBloodType == type
+                              ? Colors.white
+                              : null,
+                        ),
                       );
                     })
                     .toList(),
@@ -392,51 +387,21 @@ class _RegistrationFormState extends State<RegistrationForm> {
               const SizedBox(height: 24),
               _buildTextField(
                 'Allergies Critiques',
-                'Pénicilline, Arachides, Latex...',
+                'Pénicilline...',
                 _allergiesController,
-                maxLines: 3,
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Container(
-                    width: 8,
-                    height: 8,
-                    decoration: const BoxDecoration(
-                      color: Colors.greenAccent,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  const Text(
-                    'STATION EN SERVICE',
-                    style: TextStyle(
-                      color: Colors.greenAccent,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
+                maxLines: 2,
               ),
               const SizedBox(height: 24),
               const Text(
                 'Conditions Chroniques',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                children: [
-                  _buildStatusTag('Diabète Type 2'),
-                  _buildStatusTag('Hypertension'),
-                ],
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
               if (_chronicConditions.isNotEmpty)
                 Wrap(
                   spacing: 8,
                   children: _chronicConditions
-                      .map((condition) => _buildStatusTag(condition))
+                      .map((c) => _buildStatusTag(c))
                       .toList(),
                 ),
               const SizedBox(height: 12),
@@ -450,17 +415,11 @@ class _RegistrationFormState extends State<RegistrationForm> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  ElevatedButton.icon(
+                  IconButton.filled(
                     onPressed: _addChronicCondition,
                     icon: const Icon(Icons.add),
-                    label: const Text('Ajouter'),
-                    style: ElevatedButton.styleFrom(
+                    style: IconButton.styleFrom(
                       backgroundColor: AppColors.primaryTeal,
-                      foregroundColor: AppColors.white0,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 16,
-                      ),
                     ),
                   ),
                 ],
@@ -469,6 +428,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
           ),
         ),
         const SizedBox(height: 32),
+
         _buildSectionCard(
           context,
           icon: Icons.fingerprint_rounded,
@@ -510,14 +470,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primaryTeal.withValues(alpha: 0.05),
-            blurRadius: 20,
-            offset: const Offset(4, 4),
-          ),
-        ],
+        border: Border.all(color: Colors.grey.withOpacity(0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -537,126 +490,6 @@ class _RegistrationFormState extends State<RegistrationForm> {
           ),
           const SizedBox(height: 24),
           child,
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTextField(
-    String label,
-    String hint,
-    TextEditingController controller, {
-    bool isDate = false,
-    int maxLines = 1,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (label.isNotEmpty) ...[
-          Text(
-            label,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-              color: Colors.white.withValues(alpha: 0.8),
-            ),
-          ),
-          const SizedBox(height: 8),
-        ],
-        TextField(
-          maxLines: maxLines,
-          decoration: InputDecoration(
-            hintText: hint,
-            filled: true,
-            fillColor: Theme.of(context).scaffoldBackgroundColor,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey.withValues(alpha: 0.1)),
-            ),
-            suffixIcon: isDate
-                ? const Icon(Icons.calendar_today_rounded, size: 18)
-                : null,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDropdownField(String label, List<String> items) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
-            color: Colors.white.withValues(alpha: 0.8),
-          ),
-        ),
-        const SizedBox(height: 8),
-        DropdownButtonFormField<String>(
-          value: _selectedGender,
-          items: items
-              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-              .toList(),
-          onChanged: (val) {
-            setState(() {
-              _selectedGender = val!;
-            });
-          },
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: Theme.of(context).scaffoldBackgroundColor,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey.withValues(alpha: 0.1)),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStatusTag(String label) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: AppColors.primaryTeal.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              color: AppColors.primaryTeal,
-              fontWeight: FontWeight.bold,
-              fontSize: 12,
-            ),
-          ),
-          const SizedBox(width: 8),
-          GestureDetector(
-            onTap: () {
-              setState(() {
-                _chronicConditions.remove(label);
-              });
-            },
-            child: const Icon(
-              Icons.close,
-              size: 14,
-              color: AppColors.primaryTeal,
-            ),
-          ),
         ],
       ),
     );
@@ -724,80 +557,164 @@ class _RegistrationFormState extends State<RegistrationForm> {
     );
   }
 
+  /// CORRECTION : Ajout du controller manquant dans le TextField
+  Widget _buildTextField(
+    String label,
+    String hint,
+    TextEditingController controller, {
+    bool isDate = false,
+    int maxLines = 1,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (label.isNotEmpty)
+          Text(
+            label,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+          ),
+        const SizedBox(height: 8),
+        TextField(
+          controller:
+              controller, // ESSENTIEL : Sans cela, le texte tapé n'est pas récupéré
+          maxLines: maxLines,
+          decoration: InputDecoration(
+            hintText: hint,
+            filled: true,
+            fillColor: Theme.of(context).scaffoldBackgroundColor,
+
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey.withValues(alpha: 0.1)),
+            ),
+            suffixIcon: isDate
+                ? const Icon(Icons.calendar_today_rounded, size: 18)
+                : null,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDropdownField(String label, List<String> items) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+        ),
+        const SizedBox(height: 8),
+        DropdownButtonFormField<String>(
+          value: _selectedGender,
+          items: items
+              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+              .toList(),
+          onChanged: (val) => setState(() => _selectedGender = val),
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: Theme.of(context).scaffoldBackgroundColor,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatusTag(String label) {
+    return Chip(
+      label: Text(
+        label,
+        style: const TextStyle(color: AppColors.primaryTeal, fontSize: 12),
+      ),
+      backgroundColor: AppColors.primaryTeal.withOpacity(0.1),
+      onDeleted: () => setState(() => _chronicConditions.remove(label)),
+      deleteIconColor: AppColors.primaryTeal,
+    );
+  }
+
   Widget _buildConsentAndActions(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.primaryTeal.withValues(alpha: 0.2)),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primaryTeal.withValues(alpha: 0.1),
-            blurRadius: 20,
-          ),
-        ],
+        border: Border.all(color: AppColors.primaryTeal.withOpacity(0.2)),
       ),
-      child: Row(
+      child: Column(
         children: [
-          Checkbox(
+          CheckboxListTile(
             value: _consentChecked,
-            onChanged: (val) {
-              setState(() {
-                _consentChecked = val ?? false;
-              });
-            },
+            onChanged: (val) => setState(() => _consentChecked = val ?? false),
+            title: const Text(
+              'Accord de Consentement',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            subtitle: const Text(
+              'Le patient consent au stockage des données d\'urgence.',
+              style: TextStyle(color: AppColors.grey),
+            ),
+            controlAffinity: ListTileControlAffinity.leading,
           ),
-          const SizedBox(width: 12),
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Accord de Consentement',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+          const SizedBox(height: 24),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text(
+                  'ANNULER',
+                  style: TextStyle(color: Colors.red),
                 ),
-                Text(
-                  'Je confirme que le patient a donné son consentement éclairé pour le stockage des données d\'urgence et le traitement biométrique.',
-                  style: TextStyle(color: Colors.grey, fontSize: 12),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 24),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text(
-              'ANNULER',
-              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
-            ),
-          ),
-          const SizedBox(width: 12),
-          ElevatedButton(
-            onPressed: _isLoading ? null : _savePatient,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryTeal,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-            ),
-            child: _isLoading
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-                  )
-                : Text(
-                    widget.patientToEdit != null
-                        ? 'METTRE À JOUR'
-                        : 'CONTINUER',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(width: 12),
+              ElevatedButton(
+                onPressed: _isLoading ? null : _savePatient,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryTeal,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 16,
                   ),
+                ),
+                child: _isLoading
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(
+                        widget.patientToEdit != null
+                            ? 'METTRE À JOUR'
+                            : 'CONTINUER',
+                      ),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
+}
+
+/// CORRECTION LOGIQUE : Calcul précis de l'âge
+int calculateAge(DateTime birthDate) {
+  DateTime today = DateTime.now();
+  int age = today.year - birthDate.year;
+  if (today.month < birthDate.month ||
+      (today.month == birthDate.month && today.day < birthDate.day)) {
+    age--;
+  }
+  return age;
 }

@@ -352,6 +352,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _buildQuickAccessCards() {
     return Row(
+      spacing: 16,
       children: [
         Expanded(
           child: _buildQuickAccessCard(
@@ -359,19 +360,16 @@ class _LoginPageState extends State<LoginPage> {
             Icons.emergency,
             AppColors.emergencyRed,
             () {
-              // TODO: Navigate to emergency with guest access
               context.go(RoutesPaths.host);
             },
           ),
         ),
-        const SizedBox(width: 16),
         Expanded(
           child: _buildQuickAccessCard(
             'Patient',
             Icons.person,
             AppColors.patientBlue,
             () {
-              // TODO: Navigate to patient with guest access
               context.go('/patient');
             },
           ),
