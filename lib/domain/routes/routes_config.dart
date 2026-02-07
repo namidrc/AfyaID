@@ -1,5 +1,12 @@
+import 'package:afya_id/ui/providers/general_provider.dart';
+import 'package:afya_id/ui/views/login/login_page.dart';
+import 'package:afya_id/ui/views/login/onboarding_page.dart';
+import 'package:afya_id/ui/views/profile/profile_page.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../ui/ui.dart';
 
@@ -12,17 +19,47 @@ GoRoute hostRoute = GoRoute(
     return HostPage();
   },
 );
+GoRoute onBoardingRoute = GoRoute(
+  path: RoutesPaths.initial,
+  name: RoutesNames.initial,
+  builder: (context, state) {
+    final provider = Provider.of<GeneralProvider>(context);
+    bool isConnected =
+        provider.userModel != null && provider.userModel!.id.isNotEmpty;
+    return isConnected ? HostPage() : OnboardingPage();
+  },
+);
+GoRoute loginRoute = GoRoute(
+  path: RoutesPaths.login,
+  name: RoutesNames.login,
+  builder: (context, state) {
+    return LoginPage();
+  },
+);
+
+GoRoute profileRoute = GoRoute(
+  path: RoutesPaths.profile,
+  name: RoutesNames.profile,
+  builder: (context, state) {
+    return ProfilePage();
+  },
+);
 
 GoRouter goRouter = GoRouter(
-  initialLocation: hostRoute.path, // Start with Emergency Dashboard for MVP
+  initialLocation:
+      onBoardingRoute.path, // Start with Emergency Dashboard for MVP
   errorBuilder: (context, state) {
-    return const Center(child: Text("Error"));
+    return Scaffold(body: const Center(child: Text("Error")));
   },
   redirect: (context, state) async {
     return null;
   },
   routes: [
     hostRoute,
+    onBoardingRoute,
+    loginRoute,
+    profileRoute,
+
     // GoRoute(
     //   path: RoutesPaths.emergencyDashboard,
     //   name: RoutesNames.emergencyDashboard,

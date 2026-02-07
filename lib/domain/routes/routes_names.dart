@@ -9,4 +9,7 @@ class RoutesNames {
   static const String journal = 'Journal';
   static const String auditLogs = 'AuditLogs';
   static const String biometricScan = 'BiometricScan';
+  static const String profile = 'Profile';
+
+  static const String initial = 'Initial';
 }

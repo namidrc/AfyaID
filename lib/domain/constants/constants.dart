@@ -1,6 +1,7 @@
 import 'package:afya_id/ui/views/emergency/emergency_dashboard.dart';
 import 'package:afya_id/ui/views/journal/consultation_journal.dart';
 import 'package:afya_id/ui/views/patient/patient_vital_card.dart';
+import 'package:afya_id/ui/views/profile/profile_page.dart';
 import 'package:afya_id/ui/views/views.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -18,19 +19,27 @@ const double appRadius = 25;
 
 enum Genre { M, F }
 
+enum UserRoles { medecin, urgentiste, dentiste, infirmiere }
+
 enum AppPages {
-  emergency('Emergency', EmergencyDashboard()),
-  addPatient('AddPatient', RegistrationForm()),
-  docPatient('DocPatient', PatientVitalCard()),
-  consultation('Consultation', ConsultationJournal()),
-  journalAudit('JournalAudit', AuditLogs());
+  emergency('Urgence', Icons.dashboard_rounded, EmergencyDashboard()),
+  addPatient('Nouveau patient', Icons.person_add_rounded, RegistrationForm()),
+  docPatient('Registre', Icons.folder_shared_rounded, PatientVitalCard()),
+  consultation(
+    'Consultations',
+    Icons.receipt_long_rounded,
+    ConsultationJournal(),
+  ),
+  journalAudit('Journal d\'Audit', Icons.security_rounded, AuditLogs()),
+  profile('Profile', Icons.person, ProfilePage());
 
   // Champs personnalisés
   final String label;
+  final IconData icon;
   final Widget page;
 
   // Constructeur constant
-  const AppPages(this.label, this.page);
+  const AppPages(this.label, this.icon, this.page);
 
   // Une méthode pour vérifier si c'est un homme
   // bool get estHomme => this == AppPages.M;

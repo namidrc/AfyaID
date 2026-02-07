@@ -70,89 +70,42 @@ class HostPage extends StatelessWidget {
       child: Column(
         children: [
           const SizedBox(height: 24),
-          _buildUserInfo(
-            context,
-            collapsed: isCollapsed,
-            primaryColor: primaryColor,
-          ),
-          const SizedBox(height: 32),
+          if (provider.userModel != null) ...[
+            _buildUserInfo(
+              context,
+              collapsed: isCollapsed,
+              primaryColor: primaryColor,
+            ),
+            const SizedBox(height: 32),
+          ],
           Expanded(
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 12),
-              children: [
-                _buildNavItem(
-                  context,
-                  icon: Icons.dashboard_rounded,
-                  label: 'Tableau de bord',
-                  active: provider.selectedPage == AppPages.emergency,
-                  collapsed: isCollapsed,
-                  onTap: () {
-                    provider.selectPage(AppPages.emergency);
-                    scaffoldKey.currentState?.closeDrawer();
-                  },
-                  primaryColor: primaryColor,
-                ),
-                _buildNavItem(
-                  context,
-                  icon: Icons.person_add_rounded,
-                  label: 'Nouvel Enregistrement',
-                  active: provider.selectedPage == AppPages.addPatient,
-                  collapsed: isCollapsed,
-                  onTap: () {
-                    provider.selectPage(AppPages.addPatient);
-                    scaffoldKey.currentState?.closeDrawer();
-                  },
-                  primaryColor: primaryColor,
-                ),
-                _buildNavItem(
-                  context,
-                  icon: Icons.folder_shared_rounded,
-                  label: 'Dossiers Patients',
-                  active: provider.selectedPage == AppPages.docPatient,
-                  collapsed: isCollapsed,
-                  onTap: () {
-                    provider.selectPage(AppPages.docPatient);
-                    scaffoldKey.currentState?.closeDrawer();
-                  },
+              children: AppPages.values
+                  .map(
+                    (page) => _buildNavItem(
+                      context,
+                      icon: page.icon,
+                      label: page.label,
+                      active: provider.selectedPage == page,
+                      collapsed: isCollapsed,
+                      onTap: () {
+                        provider.selectPage(page);
+                        scaffoldKey.currentState?.closeDrawer();
+                      },
+                      primaryColor: primaryColor,
+                    ),
+                  )
+                  .toList(),
 
-                  // onTap: () => context.go(
-                  //   RoutesPaths.patientRecord.replaceAll(':id', '12345'),
-                  // ),
-                  primaryColor: primaryColor,
-                ),
-                _buildNavItem(
-                  context,
-                  icon: Icons.receipt_long_rounded,
-                  label: 'Journal des Consultations',
-                  active: provider.selectedPage == AppPages.consultation,
-                  collapsed: isCollapsed,
-                  onTap: () {
-                    provider.selectPage(AppPages.consultation);
-                    scaffoldKey.currentState?.closeDrawer();
-                  },
-                  primaryColor: primaryColor,
-                ),
-                _buildNavItem(
-                  context,
-                  icon: Icons.security_rounded,
-                  label: 'Journal d\'Audit',
-                  active: provider.selectedPage == AppPages.journalAudit,
-                  collapsed: isCollapsed,
-                  onTap: () {
-                    provider.selectPage(AppPages.journalAudit);
-                    scaffoldKey.currentState?.closeDrawer();
-                  },
-                  primaryColor: primaryColor,
-                ),
-                const Divider(height: 32),
-                _buildNavItem(
-                  context,
-                  icon: Icons.settings_rounded,
-                  label: 'Paramètres',
-                  collapsed: isCollapsed,
-                  primaryColor: primaryColor,
-                ),
-              ],
+              // const Divider(height: 32),
+              // _buildNavItem(
+              //   context,
+              //   icon: Icons.settings_rounded,
+              //   label: 'Paramètres',
+              //   collapsed: isCollapsed,
+              //   primaryColor: primaryColor,
+              // ),
             ),
           ),
           const SizedBox(height: 24),
@@ -166,6 +119,8 @@ class HostPage extends StatelessWidget {
     bool collapsed = false,
     required Color primaryColor,
   }) {
+    final provider = Provider.of<GeneralProvider>(context);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
@@ -187,16 +142,16 @@ class HostPage extends StatelessWidget {
             ),
           ),
           if (!collapsed) ...[
-            const Expanded(
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Dr. Moreau',
+                    provider.userModel!.fullName,
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                   Text(
-                    'Médecin AfyaID',
+                    provider.userModel!.role,
                     style: TextStyle(
                       color: Colors.grey,
                       fontSize: 10,

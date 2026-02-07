@@ -1,3 +1,4 @@
+import 'package:afya_id/data/models/models.dart';
 import 'package:afya_id/domain/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,13 +14,21 @@ class GeneralProvider extends ChangeNotifier {
   }
 
   //User handling
-  // DoctorModel? _userModel;
-  // DoctorModel? get userModel => _userModel;
+  UserModel? _userModel;
+  UserModel? get userModel => _userModel;
 
-  // void setUserData(DoctorModel uModel) {
-  //   _userModel = uModel;
-  //   notifyListeners();
-  // }
+  void setUserData(UserModel uModel) {
+    _userModel = uModel;
+    notifyListeners();
+  }
+
+  Future<void> logout() async {
+    _userModel = null;
+    if (pref != null) {
+      await pref!.remove('USERID');
+    }
+    notifyListeners();
+  }
 
   //Page Navigation handling
   AppPages selectedPage = AppPages.emergency;

@@ -10,4 +10,7 @@ class RoutesPaths {
   static const String journal = '/journal';
   static const String auditLogs = '/audit';
   static const String biometricScan = '/scan';
+  static const String profile = '/profile';
+
+  static const String initial = '/initial';
 }

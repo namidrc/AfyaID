@@ -1,31 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:afya_id/ui/styles/app_colors.dart';
 import 'package:afya_id/domain/utils/general_utils.dart';
-
-// Local Patient Model
-class Patient {
-  final String id;
-  final String firstName;
-  final String lastName;
-  final int age;
-  final String gender;
-  final String location;
-  final String imageUrl;
-  final String bloodGroup;
-  final String allergy;
-
-  Patient({
-    required this.id,
-    required this.firstName,
-    required this.lastName,
-    required this.age,
-    required this.gender,
-    required this.location,
-    required this.imageUrl,
-    required this.bloodGroup,
-    required this.allergy,
-  });
-}
+import 'package:afya_id/data/models/models.dart';
+import 'package:afya_id/data/services/services.dart';
 
 class PatientVitalCard extends StatefulWidget {
   final String? initialPatientId;
@@ -38,75 +15,23 @@ class PatientVitalCard extends StatefulWidget {
 class _PatientVitalCardState extends State<PatientVitalCard> {
   String? _selectedPatientId;
   final TextEditingController _searchController = TextEditingController();
-  List<Patient> _filteredPatients = [];
-
-  // Mock Data
-  final List<Patient> _allPatients = [
-    Patient(
-      id: "456789",
-      firstName: "Amara",
-      lastName: "Sylla",
-      age: 34,
-      gender: "HOMME",
-      location: "Camp Goma, Zone B",
-      imageUrl:
-          'https://lh3.googleusercontent.com/aida-public/AB6AXuDzIGuNmpl9JKMsc3vh03Ycrp_KKvhdoNpbLai-M2vEyU34uRFGRAhxiiJyMcGQ99a0LRaaKO4XAWY7jN53U4SqSwp2_c8jhkJDGDx92xDuDxfxm0GFbNn3htU7LkF6vI7ejg9uEx5oZXwgsIcFQgMTYlrJla7Z5rKMnv9LHvS-kHIIWM4a6XNUm9qdVrDWGq7ZpRe90yOCaXGTV3At4KWyRrP29IPjBzvQPTYRCAt_MIzfMRJYSRLms1gwE51BxaXZwdad8oV7jn4',
-      bloodGroup: "O+",
-      allergy: "ARACHIDES",
-    ),
-    Patient(
-      id: "123456",
-      firstName: "Fatou",
-      lastName: "Diallo",
-      age: 25,
-      gender: "FEMME",
-      location: "Kinshasa, Gombe",
-      imageUrl:
-          'https://img.freepik.com/photos-gratuite/portrait-jeune-femme-africaine-souriante_23-2148747761.jpg',
-      bloodGroup: "A+",
-      allergy: "AUCUNE",
-    ),
-    Patient(
-      id: "789012",
-      firstName: "Jean",
-      lastName: "Kambale",
-      age: 42,
-      gender: "HOMME",
-      location: "Lubumbashi, Centre",
-      imageUrl:
-          'https://img.freepik.com/photos-gratuite/portrait-homme-africain-souriant-lunettes_23-2148747768.jpg',
-      bloodGroup: "B-",
-      allergy: "PENICILLINE",
-    ),
-    Patient(
-      id: "345678",
-      firstName: "Marie",
-      lastName: "Mukuna",
-      age: 60,
-      gender: "FEMME",
-      location: "Goma, Katindo",
-      imageUrl:
-          'https://img.freepik.com/photos-gratuite/portrait-femme-africaine-agee-souriante_23-2148747775.jpg',
-      bloodGroup: "AB+",
-      allergy: "POUSSIÈRE",
-    ),
-  ];
+  final PatientFirestoreService _patientService = PatientFirestoreService();
+  List<PatientModel> _filteredPatients = [];
+  List<PatientModel> _allPatients = [];
 
   @override
   void initState() {
     super.initState();
     _selectedPatientId = widget.initialPatientId;
-    _filteredPatients = _allPatients;
   }
 
-  void _filterPatients(String query) {
+  void _filterPatients(String query, List<PatientModel> patients) {
     setState(() {
       if (query.isEmpty) {
-        _filteredPatients = _allPatients;
+        _filteredPatients = patients;
       } else {
-        _filteredPatients = _allPatients.where((patient) {
-          final fullName = "${patient.firstName} ${patient.lastName}"
-              .toLowerCase();
+        _filteredPatients = patients.where((patient) {
+          final fullName = patient.fullName.toLowerCase();
           return fullName.contains(query.toLowerCase()) ||
               patient.id.contains(query);
         }).toList();
@@ -117,16 +42,29 @@ class _PatientVitalCardState extends State<PatientVitalCard> {
   @override
   Widget build(BuildContext context) {
     if (_selectedPatientId != null) {
-      final patient = _allPatients.firstWhere(
-        (p) => p.id == _selectedPatientId,
-        orElse: () => _allPatients.first, // Fallback
-      );
-      return _PatientDetailsView(
-        patient: patient,
-        onBack: () {
-          setState(() {
-            _selectedPatientId = null;
-          });
+      return StreamBuilder<PatientModel?>(
+        stream: _patientService.streamPatient(_selectedPatientId!),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            return Center(child: Text('Erreur: ${snapshot.error}'));
+          }
+
+          if (!snapshot.hasData || snapshot.data == null) {
+            return const Center(child: Text('Patient non trouvé'));
+          }
+
+          return _PatientDetailsView(
+            patient: snapshot.data!,
+            onBack: () {
+              setState(() {
+                _selectedPatientId = null;
+              });
+            },
+          );
         },
       );
     }
@@ -134,58 +72,82 @@ class _PatientVitalCardState extends State<PatientVitalCard> {
   }
 
   Widget _buildPatientList(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1000),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Liste des Patients",
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  // color: AppColors.patientBlue,
-                ),
-              ),
-              const SizedBox(height: 24),
-              GeneralUtils().generalSearchBar(
-                context,
-                searchBarController: _searchController,
-                onChanged: _filterPatients,
-              ),
-              const SizedBox(height: 24),
-              if (_filteredPatients.isEmpty)
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(40.0),
-                    child: Text(
-                      "Aucun patient trouvé.",
-                      style: TextStyle(color: AppColors.grey),
+    return StreamBuilder<List<PatientModel>>(
+      stream: _patientService.streamAllPatients(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError) {
+          return Center(child: Text('Erreur: ${snapshot.error}'));
+        }
+
+        final patients = snapshot.data ?? [];
+
+        // Update filtered patients when data changes
+        if (_searchController.text.isEmpty) {
+          _allPatients = patients;
+          _filteredPatients = patients;
+        } else {
+          _allPatients = patients;
+          _filterPatients(_searchController.text, patients);
+        }
+
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1000),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Liste des Patients",
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      // color: AppColors.patientBlue,
                     ),
                   ),
-                )
-              else
-                ListView.separated(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: _filteredPatients.length,
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(height: 16),
-                  itemBuilder: (context, index) {
-                    final patient = _filteredPatients[index];
-                    return _buildPatientListItem(context, patient);
-                  },
-                ),
-            ],
+                  const SizedBox(height: 24),
+                  GeneralUtils().generalSearchBar(
+                    context,
+                    searchBarController: _searchController,
+                    onChanged: (query) => _filterPatients(query, patients),
+                  ),
+                  const SizedBox(height: 24),
+                  if (_filteredPatients.isEmpty)
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(40.0),
+                        child: Text(
+                          "Aucun patient trouvé.",
+                          style: TextStyle(color: AppColors.grey),
+                        ),
+                      ),
+                    )
+                  else
+                    ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: _filteredPatients.length,
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: 16),
+                      itemBuilder: (context, index) {
+                        final patient = _filteredPatients[index];
+                        return _buildPatientListItem(context, patient);
+                      },
+                    ),
+                ],
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildPatientListItem(BuildContext context, Patient patient) {
+  Widget _buildPatientListItem(BuildContext context, PatientModel patient) {
     return GeneralUtils().generalButton(
       padding: EdgeInsets.zero,
       backColor: Theme.of(context).colorScheme.surface,
@@ -210,46 +172,50 @@ class _PatientVitalCardState extends State<PatientVitalCard> {
         ),
         child: Row(
           children: [
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                image: DecorationImage(
-                  image: NetworkImage(patient.imageUrl),
-                  fit: BoxFit.cover,
-                  onError: (exception, stackTrace) {
-                    // Fallback if image fails
-                  },
-                ),
-                color: AppColors.grey2,
-              ),
-              // Fallback icon if needed could be handled here or with errorBuilder
-              child: null,
+            // Avatar
+            CircleAvatar(
+              radius: 30,
+              backgroundImage: patient.imageUrl.isNotEmpty
+                  ? NetworkImage(patient.imageUrl)
+                  : null,
+              child: patient.imageUrl.isEmpty
+                  ? Text(
+                      patient.firstName[0].toUpperCase(),
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )
+                  : null,
             ),
-            const SizedBox(width: 20),
+            const SizedBox(width: 16),
+            // Patient Info
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "${patient.firstName} ${patient.lastName}",
+                    patient.fullName,
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 4),
+                  Text(
+                    "${patient.age} ans • ${patient.gender}",
+                    style: TextStyle(color: AppColors.grey, fontSize: 14),
+                  ),
+                  const SizedBox(height: 4),
                   Row(
                     children: [
-                      _buildMiniPill(patient.gender),
-                      const SizedBox(width: 8),
-                      Text(
-                        "${patient.age} ANS",
-                        style: const TextStyle(
-                          color: AppColors.grey,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
+                      Icon(Icons.location_on, size: 14, color: AppColors.grey),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          patient.location,
+                          style: TextStyle(color: AppColors.grey, fontSize: 12),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
@@ -257,63 +223,32 @@ class _PatientVitalCardState extends State<PatientVitalCard> {
                 ],
               ),
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  "ID: #${patient.id}",
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.patientBlue,
-                  ),
+            // Patient ID Badge
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: AppColors.patientBlue.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                "#${patient.id}",
+                style: const TextStyle(
+                  color: AppColors.patientBlue,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
                 ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Icon(Icons.location_on, size: 14, color: AppColors.grey),
-                    const SizedBox(width: 4),
-                    Text(
-                      patient.location,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: AppColors.grey,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(width: 16),
-            const Icon(
-              Icons.arrow_forward_ios,
-              size: 16,
-              color: AppColors.grey,
+              ),
             ),
           ],
         ),
       ),
     );
   }
-
-  Widget _buildMiniPill(String label) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: AppColors.grey.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        label,
-        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
-      ),
-    );
-  }
 }
-
 // ORIGINAL CONTENT REFACTORED INTO A STATLESS WIDGET FOR DETAILS
 
 class _PatientDetailsView extends StatelessWidget {
-  final Patient patient;
+  final PatientModel patient;
   final VoidCallback onBack;
 
   const _PatientDetailsView({required this.patient, required this.onBack});
