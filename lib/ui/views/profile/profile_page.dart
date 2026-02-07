@@ -178,7 +178,7 @@ class _ProfilePageState extends State<ProfilePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'Mon Profil',
+                'My Profile',
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.w900,
@@ -187,7 +187,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               const SizedBox(height: 4),
               Text(
-                'Gérez vos informations personnelles',
+                'Your personnal informations',
                 style: TextStyle(color: AppColors.grey, fontSize: 16),
               ),
             ],
@@ -203,7 +203,7 @@ class _ProfilePageState extends State<ProfilePage> {
             _isEditing ? Icons.close : Icons.edit,
             color: _isEditing ? AppColors.red : AppColors.primaryTeal,
           ),
-          tooltip: _isEditing ? 'Annuler' : 'Modifier',
+          tooltip: _isEditing ? 'Cancel' : 'Edit',
         ),
       ],
     );
@@ -330,7 +330,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   const SizedBox(height: 16),
                   _buildTextField(
                     controller: _phoneController,
-                    label: 'Téléphone',
+                    label: 'Phone',
                     icon: Icons.phone,
                   ),
                   const SizedBox(height: 24),
@@ -347,7 +347,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                           )
                         : const Text(
-                            'Enregistrer',
+                            'Save',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -493,7 +493,7 @@ class _ProfilePageState extends State<ProfilePage> {
               Icon(Icons.logout, color: AppColors.red),
               SizedBox(width: 12),
               Text(
-                'Se déconnecter',
+                'Log out',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,

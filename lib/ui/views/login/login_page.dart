@@ -141,7 +141,7 @@ class _LoginPageState extends State<LoginPage> {
         const SizedBox(height: 8),
 
         Text(
-          'Système de Gestion Médicale',
+          'Mediical management system',
           style: TextStyle(
             fontSize: 16,
             color: AppColors.grey,
@@ -187,7 +187,7 @@ class _LoginPageState extends State<LoginPage> {
       controller: _passwordController,
       obscureText: !_isPasswordVisible,
       decoration: InputDecoration(
-        labelText: 'Mot de passe',
+        labelText: 'Password',
         hintText: '••••••••',
         prefixIcon: const Icon(Icons.lock_outline),
         suffixIcon: IconButton(
@@ -237,7 +237,7 @@ class _LoginPageState extends State<LoginPage> {
               },
               activeColor: AppColors.primaryTeal,
             ),
-            const Text('Se souvenir de moi', style: TextStyle(fontSize: 14)),
+            const Text('Remember me', style: TextStyle(fontSize: 14)),
           ],
         ),
         TextButton(
@@ -245,7 +245,7 @@ class _LoginPageState extends State<LoginPage> {
             // TODO: Navigate to forgot password
           },
           child: const Text(
-            'Mot de passe oublié?',
+            'Forgot password?',
             style: TextStyle(
               color: AppColors.primaryTeal,
               fontWeight: FontWeight.w600,
@@ -320,7 +320,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
             )
           : const Text(
-              'Se connecter',
+              'Log in',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -337,7 +337,7 @@ class _LoginPageState extends State<LoginPage> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
-            'Accès rapide',
+            'Quick access',
             style: TextStyle(
               color: AppColors.grey,
               fontSize: 14,
@@ -356,7 +356,7 @@ class _LoginPageState extends State<LoginPage> {
       children: [
         Expanded(
           child: _buildQuickAccessCard(
-            'Urgence',
+            'Emergency',
             Icons.emergency,
             AppColors.emergencyRed,
             () {
@@ -416,7 +416,7 @@ class _LoginPageState extends State<LoginPage> {
         ),
         const SizedBox(height: 8),
         Text(
-          '© 2026 AfyaID - Tous droits réservés',
+          '© 2026 NAMI - All right reserved',
           style: TextStyle(color: AppColors.grey, fontSize: 12),
         ),
       ],

@@ -7,13 +7,12 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:afya_id/domain/routes/routes_paths.dart';
 
-final scaffoldKey = GlobalKey<ScaffoldState>();
-
 class HostPage extends StatelessWidget {
   const HostPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final scaffoldKey = GlobalKey<ScaffoldState>();
     final bool isDesktop = MediaQuery.of(context).size.width > 900;
 
     final provider = Provider.of<GeneralProvider>(context);
@@ -22,10 +21,12 @@ class HostPage extends StatelessWidget {
         : AppColors.primaryTeal;
     return Scaffold(
       key: scaffoldKey,
-      drawer: isDesktop ? null : _buildSidebar(context, isMobile: true),
+      drawer: isDesktop
+          ? null
+          : _buildSidebar(context, isMobile: true, scaffoldKey),
       body: Row(
         children: [
-          if (isDesktop) _buildSidebar(context),
+          if (isDesktop) _buildSidebar(context, scaffoldKey),
           Expanded(
             child: Container(
               decoration: BoxDecoration(
@@ -42,7 +43,7 @@ class HostPage extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  _buildHeader(context, isDesktop, primaryColor),
+                  _buildHeader(context, isDesktop, primaryColor, scaffoldKey),
                   Expanded(child: provider.selectedPage.page),
                 ],
               ),
@@ -53,7 +54,11 @@ class HostPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSidebar(BuildContext context, {bool isMobile = false}) {
+  Widget _buildSidebar(
+    BuildContext context,
+    GlobalKey<ScaffoldState> key, {
+    bool isMobile = false,
+  }) {
     final bool isCollapsed =
         !isMobile && MediaQuery.of(context).size.width < 1200;
     final primaryColor = AppColors.primaryTeal;
@@ -97,7 +102,7 @@ class HostPage extends StatelessWidget {
                       collapsed: isCollapsed,
                       onTap: () {
                         provider.selectPage(page);
-                        scaffoldKey.currentState?.closeDrawer();
+                        key.currentState?.closeDrawer();
                       },
                       primaryColor: primaryColor,
                     ),
@@ -238,6 +243,7 @@ class HostPage extends StatelessWidget {
     BuildContext context,
     bool isDesktop,
     Color primaryColor,
+    GlobalKey<ScaffoldState> key,
   ) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -253,7 +259,7 @@ class HostPage extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.menu),
               onPressed: () {
-                scaffoldKey.currentState!.openDrawer();
+                key.currentState!.openDrawer();
               },
             ),
             const SizedBox(width: 8),

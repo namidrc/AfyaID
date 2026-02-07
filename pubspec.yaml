@@ -40,10 +40,26 @@ dependencies:
   go_router: ^17.0.1
   firebase_core: ^4.4.0
   cloud_firestore: ^6.1.2
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "images/logo_sans_texte_trans.png"
+  min_sdk_android: 24
+  adaptive_icon_background: "#ffffffff"
+  adaptive_icon_foreground: "images/logo_sans_texte_trans.png"
+  web:
+    generate: true
+    image_path: "images/logo_sans_texte.png"
+  windows:
+    generate: true
+    image_path: "images/logo_sans_texte.png" 
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

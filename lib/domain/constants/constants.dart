@@ -22,15 +22,15 @@ enum Genre { M, F }
 enum UserRoles { medecin, urgentiste, dentiste, infirmiere }
 
 enum AppPages {
-  emergency('Urgence', Icons.dashboard_rounded, EmergencyDashboard()),
-  addPatient('Nouveau patient', Icons.person_add_rounded, RegistrationForm()),
-  docPatient('Registre', Icons.folder_shared_rounded, PatientVitalCard()),
+  emergency('Emergency', Icons.dashboard_rounded, EmergencyDashboard()),
+  addPatient('New Patient', Icons.person_add_rounded, RegistrationForm()),
+  docPatient('Register', Icons.folder_shared_rounded, PatientVitalCard()),
   consultation(
     'Consultations',
     Icons.receipt_long_rounded,
     ConsultationJournal(),
   ),
-  journalAudit('Journal d\'Audit', Icons.security_rounded, AuditLogs()),
+  journalAudit('Audit Journal', Icons.security_rounded, AuditLogs()),
   profile('Profile', Icons.person, ProfilePage());
 
   // Champs personnalisés

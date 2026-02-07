@@ -55,11 +55,11 @@ class _PatientVitalCardState extends State<PatientVitalCard> {
             }
 
             if (snapshot.hasError) {
-              return Center(child: Text('Erreur: ${snapshot.error}'));
+              return Center(child: Text('Error: ${snapshot.error}'));
             }
 
             if (!snapshot.hasData || snapshot.data == null) {
-              return const Center(child: Text('Patient non trouvé'));
+              return const Center(child: Text('Patient not found'));
             }
 
             return _PatientDetailsView(
@@ -86,7 +86,7 @@ class _PatientVitalCardState extends State<PatientVitalCard> {
         }
 
         if (snapshot.hasError) {
-          return Center(child: Text('Erreur: ${snapshot.error}'));
+          return Center(child: Text('Error: ${snapshot.error}'));
         }
 
         final patients = snapshot.data ?? [];
@@ -107,7 +107,7 @@ class _PatientVitalCardState extends State<PatientVitalCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Liste des Patients",
+                    "Patient List",
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       // color: AppColors.patientBlue,
@@ -125,7 +125,7 @@ class _PatientVitalCardState extends State<PatientVitalCard> {
                       child: Padding(
                         padding: const EdgeInsets.all(40.0),
                         child: Text(
-                          "Aucun patient trouvé.",
+                          "No patients found.",
                           style: TextStyle(color: AppColors.grey),
                         ),
                       ),
@@ -207,7 +207,7 @@ class _PatientVitalCardState extends State<PatientVitalCard> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    "${calculateAge(patient.dateOfBirth)} ans • ${patient.gender}",
+                    "${calculateAge(patient.dateOfBirth)} yrs • ${patient.gender}",
                     style: TextStyle(color: AppColors.grey, fontSize: 14),
                   ),
                   const SizedBox(height: 4),
@@ -272,18 +272,18 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Confirmer la suppression'),
+        title: const Text('Confirm Deletion'),
         content: Text(
-          'Êtes-vous sûr de vouloir supprimer le patient ${widget.patient.fullName}?',
+          'Are you sure you want to delete the patient ${widget.patient.fullName}?',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('ANNULER'),
+            child: const Text('CANCEL'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('SUPPRIMER', style: TextStyle(color: Colors.red)),
+            child: const Text('DELETE', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -294,7 +294,7 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
         await _patientService.deletePatient(widget.patient.id);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Patient supprimé avec succès')),
+            const SnackBar(content: Text('Patient deleted successfully')),
           );
           widget.onBack();
         }
@@ -302,7 +302,7 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
         if (mounted) {
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(SnackBar(content: Text('Erreur: $e')));
+          ).showSnackBar(SnackBar(content: Text('Error: $e')));
         }
       }
     }
@@ -372,7 +372,7 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
               children: [
                 const Icon(Icons.arrow_back, size: 16, color: AppColors.white0),
                 Text(
-                  'Liste Patients',
+                  'Patient List',
                   style: TextStyle(color: AppColors.white0, fontWeight: .bold),
                 ),
               ],
@@ -382,7 +382,7 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
         const Icon(Icons.chevron_right, size: 16, color: AppColors.grey),
         Expanded(
           child: Text(
-            'Fiche Patient #${widget.patient.id}',
+            'Patient Record #${widget.patient.id}',
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
           ),
         ),
@@ -398,8 +398,8 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
         _buildIdentityCard(context),
 
         _buildCriticalCard(
-          'ALLERGIE SÉVÈRE',
-          widget.patient.allergy.isEmpty ? "Aucune" : widget.patient.allergy,
+          'SEVERE ALLERGY',
+          widget.patient.allergy.isEmpty ? "None" : widget.patient.allergy,
           AppColors.surfacePatientDark,
           Icons.warning_rounded,
           isAllergy: true,
@@ -498,7 +498,7 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
                           Row(
                             children: [
                               _buildPill(
-                                '${calculateAge(widget.patient.dateOfBirth)} ANS',
+                                '${calculateAge(widget.patient.dateOfBirth)} YRS',
                               ),
                               const SizedBox(width: 8),
                               _buildPill(widget.patient.gender),
@@ -514,13 +514,13 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
                   children: [
                     Expanded(
                       child: _buildInfoItem(
-                        'DATE DE NAISSANCE',
+                        'DATE OF BIRTH',
                         DateUtil.dateFormatter(widget.patient.dateOfBirth),
                       ), // Placeholder, logic can be added
                     ),
                     Expanded(
                       child: _buildInfoItem(
-                        'LOCALISATION',
+                        'LOCATION',
                         widget.patient.location,
                       ),
                     ),
@@ -570,47 +570,6 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
     );
   }
 
-  Widget _buildVitalMetric(
-    String label,
-    String value,
-    IconData icon,
-    Color color,
-    BuildContext context,
-  ) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.grey.withValues(alpha: 0.3)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 10,
-                  color: AppColors.grey,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Icon(icon, color: color, size: 16),
-            ],
-          ),
-          Text(
-            value,
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildCenterColumn(BuildContext context) {
     return Column(
       children: [
@@ -620,7 +579,7 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
             children: [
               Expanded(
                 child: _buildCriticalCard(
-                  'GROUPE SANGUIN',
+                  'BLOOD TYPE',
                   widget.patient.bloodGroup,
                   Colors.redAccent,
                   Icons.bloodtype,
@@ -696,7 +655,7 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
               ),
               if (isAllergy)
                 const Text(
-                  'Réaction: Anaphylaxie',
+                  'Reaction: Anaphylaxis',
                   style: TextStyle(fontSize: 12, color: AppColors.grey),
                 ),
             ],
@@ -727,7 +686,7 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
                       Icon(Icons.history, color: AppColors.grey, size: 20),
                       Expanded(
                         child: Text(
-                          'Antécédents & Notes',
+                          'Medical History & Notes',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
@@ -829,7 +788,7 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
   }
 
   Widget _buildStatusPill(String status) {
-    final bool isSpecial = status == 'Actif' || status == 'Hier';
+    final bool isSpecial = status == 'Active' || status == 'Yesterday';
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
@@ -856,12 +815,12 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
           spacing: 10,
           children: [
             Expanded(
-              child: _buildActionButton(Icons.edit_document, 'ÉDITER', context),
+              child: _buildActionButton(Icons.edit_document, 'EDIT', context),
             ),
             Expanded(
               child: _buildActionButton(
                 Icons.delete,
-                'SUPPRIMER',
+                'DELETE',
                 context,
                 isDelete: true,
               ),
@@ -884,8 +843,8 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
   }) {
     return ElevatedButton.icon(
       onPressed: () {
-        if (label == 'ÉDITER') {
-          // Naviguer vers la page d'édition avec le patient
+        if (label == 'EDIT') {
+          // Navigate to edit page with patient
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) =>
@@ -936,7 +895,7 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
               SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  'Traitements Actifs',
+                  'Active Treatments',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
@@ -947,9 +906,9 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
             ],
           ),
           const SizedBox(height: 20),
-          _buildTreatmentItem('Ventoline 100µg', '2 bouffées si besoin'),
+          _buildTreatmentItem('Albuterol 100µg', '2 puffs as needed'),
           const Divider(height: 32, color: AppColors.grey),
-          _buildTreatmentItem('Paracétamol 1g', 'Toutes les 6h (Douleur)'),
+          _buildTreatmentItem('Acetaminophen 1g', 'Every 6h (Pain)'),
         ],
       ),
     );
@@ -1001,7 +960,7 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
               ),
               const SizedBox(width: 12),
               Text(
-                'Contact Urgence',
+                'Emergency Contact',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 14,

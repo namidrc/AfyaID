@@ -22,7 +22,6 @@ class _RegistrationFormState extends State<RegistrationForm> {
   List<String> _chronicConditions = [];
   bool _consentChecked = false;
 
-  // Contrôleurs de texte
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
@@ -37,7 +36,6 @@ class _RegistrationFormState extends State<RegistrationForm> {
   @override
   void initState() {
     super.initState();
-    // Valeurs par défaut
     _selectedBloodType = 'A+';
     _selectedGender = 'M';
 
@@ -73,19 +71,15 @@ class _RegistrationFormState extends State<RegistrationForm> {
   }
 
   Future<void> _savePatient() async {
-    // CORRECTION : Utilisation de "return" pour arrêter l'exécution si validation échoue
     if (_firstNameController.text.isEmpty ||
         _lastNameController.text.isEmpty ||
         _nationalIdController.text.isEmpty) {
-      snackbarMessage(
-        context,
-        text: "Veuillez remplir tous les champs obligatoires",
-      );
+      snackbarMessage(context, text: "Please fill in all required fields");
       return;
     }
 
     if (!_consentChecked) {
-      snackbarMessage(context, text: "Veuillez confirmer le consentement");
+      snackbarMessage(context, text: "Please confirm the consent");
       return;
     }
 
@@ -96,7 +90,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
         _dateOfBirthController.text,
       );
       if (dateOfBirth == null) {
-        throw "Format de date invalide (AAAA-MM-JJ)";
+        throw "Invalid date format (YYYY-MM-DD)";
       }
 
       final patient = PatientModel(
@@ -120,15 +114,16 @@ class _RegistrationFormState extends State<RegistrationForm> {
       if (widget.patientToEdit != null) {
         await _patientService.updatePatient(patient);
         if (mounted) {
-          snackbarMessage(context, text: 'Patient mis à jour avec succès');
+          snackbarMessage(context, text: 'Patient updated successfully');
         }
       } else {
         await _patientService.createPatient(patient);
-        if (mounted) snackbarMessage(context, text: 'Patient créé avec succès');
+        if (mounted)
+          snackbarMessage(context, text: 'Patient created successfully');
         _resetForm();
       }
     } catch (e) {
-      if (mounted) snackbarMessage(context, text: 'Erreur: $e');
+      if (mounted) snackbarMessage(context, text: 'Error: $e');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -176,8 +171,8 @@ class _RegistrationFormState extends State<RegistrationForm> {
                 const SizedBox(height: 32),
                 Text(
                   widget.patientToEdit != null
-                      ? 'Modifier Enregistrement'
-                      : 'Nouvel Enregistrement',
+                      ? 'Edit Registration'
+                      : 'New Registration',
                   style: const TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
@@ -185,7 +180,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'Inscrire un nouveau patient dans la base de données de santé d\'urgence.',
+                  'Register a new patient in the emergency health database.',
                   style: TextStyle(color: Colors.grey),
                 ),
                 // const SizedBox(height: 40),
@@ -225,65 +220,13 @@ class _RegistrationFormState extends State<RegistrationForm> {
     );
   }
 
-  Widget _buildProgressStepper(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.withOpacity(0.1)),
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'ÉTAPE 2 SUR 4',
-                    style: TextStyle(
-                      color: AppColors.primaryTeal,
-                      fontWeight: FontWeight.w900,
-                      fontSize: 12,
-                    ),
-                  ),
-                  Text(
-                    'Profil Médical & Biométrie',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-              Text(
-                '50% Terminé',
-                style: TextStyle(
-                  color: Colors.grey.shade600,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          LinearProgressIndicator(
-            value: 0.5,
-            backgroundColor: AppColors.primaryTeal.withOpacity(0.1),
-            color: AppColors.primaryTeal,
-            minHeight: 8,
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildFormSections(BuildContext context) {
     return Column(
       children: [
         _buildSectionCard(
           context,
           icon: Icons.person_rounded,
-          title: 'Détails Personnels',
+          title: 'Personal Details',
           child: LayoutBuilder(
             builder: (context, constraints) {
               return Wrap(
@@ -295,8 +238,8 @@ class _RegistrationFormState extends State<RegistrationForm> {
                         ? (constraints.maxWidth / 2) - 12
                         : constraints.maxWidth,
                     child: _buildTextField(
-                      'Prénom',
-                      'p.ex. John',
+                      'First Name',
+                      'e.g. John',
                       _firstNameController,
                     ),
                   ),
@@ -305,8 +248,8 @@ class _RegistrationFormState extends State<RegistrationForm> {
                         ? (constraints.maxWidth / 2) - 12
                         : constraints.maxWidth,
                     child: _buildTextField(
-                      'Nom',
-                      'p.ex. Doe',
+                      'Last Name',
+                      'e.g. Doe',
                       _lastNameController,
                     ),
                   ),
@@ -315,8 +258,8 @@ class _RegistrationFormState extends State<RegistrationForm> {
                         ? (constraints.maxWidth / 2) - 12
                         : constraints.maxWidth,
                     child: _buildTextField(
-                      'Date de Naissance',
-                      'AAAA-MM-JJ',
+                      'Date of Birth',
+                      'YYYY-MM-DD',
                       _dateOfBirthController,
                       isDate: true,
                     ),
@@ -325,14 +268,14 @@ class _RegistrationFormState extends State<RegistrationForm> {
                     width: constraints.maxWidth > 600
                         ? (constraints.maxWidth / 2) - 12
                         : constraints.maxWidth,
-                    child: _buildDropdownField('Genre', ['M', 'F']),
+                    child: _buildDropdownField('Gender', ['M', 'F']),
                   ),
                   SizedBox(
                     width: constraints.maxWidth > 600
                         ? (constraints.maxWidth / 2) - 12
                         : constraints.maxWidth,
                     child: _buildTextField(
-                      'ID National',
+                      'National ID',
                       'ID-000-000',
                       _nationalIdController,
                     ),
@@ -342,8 +285,8 @@ class _RegistrationFormState extends State<RegistrationForm> {
                         ? (constraints.maxWidth / 2) - 12
                         : constraints.maxWidth,
                     child: _buildTextField(
-                      'Localisation',
-                      'Kinshasa',
+                      'Location',
+                      'e.g. Kinshasa',
                       _locationController,
                     ),
                   ),
@@ -356,12 +299,12 @@ class _RegistrationFormState extends State<RegistrationForm> {
         _buildSectionCard(
           context,
           icon: Icons.medical_services_rounded,
-          title: 'Profil Médical',
+          title: 'Medical Profile',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'Groupe Sanguin',
+                'Blood Type',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
@@ -388,14 +331,14 @@ class _RegistrationFormState extends State<RegistrationForm> {
               ),
               const SizedBox(height: 24),
               _buildTextField(
-                'Allergies Critiques',
-                'Pénicilline...',
+                'Critical Allergies',
+                'Penicillin...',
                 _allergiesController,
                 maxLines: 2,
               ),
               const SizedBox(height: 24),
               const Text(
-                'Conditions Chroniques',
+                'Chronic Conditions',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
@@ -412,7 +355,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
                   Expanded(
                     child: _buildTextField(
                       '',
-                      'Ajouter une condition',
+                      'Add a condition',
                       _chronicConditionsInputController,
                     ),
                   ),
@@ -434,15 +377,15 @@ class _RegistrationFormState extends State<RegistrationForm> {
         _buildSectionCard(
           context,
           icon: Icons.fingerprint_rounded,
-          title: 'Enrôlement Biométrique',
+          title: 'Biometric Enrollment',
           child: IntrinsicHeight(
             child: Row(
               children: [
                 Expanded(
                   child: _buildBiometricCard(
                     Icons.face_rounded,
-                    'Reconnaissance Faciale',
-                    'Capturer le portrait frontal.',
+                    'Facial Recognition',
+                    'Capture front portrait.',
                     false,
                   ),
                 ),
@@ -450,8 +393,8 @@ class _RegistrationFormState extends State<RegistrationForm> {
                 Expanded(
                   child: _buildBiometricCard(
                     Icons.fingerprint_rounded,
-                    'Empreinte Digitale',
-                    'Scanner l\'index droit.',
+                    'Fingerprint',
+                    'Scan right index finger.',
                     true,
                   ),
                 ),
@@ -558,9 +501,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
               ),
               label: !AdaptiveUtil.isCompact(context)
                   ? Text(
-                      !isFingerPrint
-                          ? 'CAPTURER VISAGE'
-                          : 'ENREGISTRER EMPREINTE',
+                      !isFingerPrint ? 'CAPTURE FACE' : 'REGISTER FINGERPRINT',
                     )
                   : Container(),
               style: ElevatedButton.styleFrom(
@@ -574,7 +515,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
     );
   }
 
-  /// CORRECTION : Ajout du controller manquant dans le TextField
+  /// NOTE: Added missing controller in TextField
   Widget _buildTextField(
     String label,
     String hint,
@@ -593,7 +534,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
         const SizedBox(height: 8),
         TextField(
           controller:
-              controller, // ESSENTIEL : Sans cela, le texte tapé n'est pas récupéré
+              controller, // IMPORTANT: Without this, the entered text is not captured
           maxLines: maxLines,
           decoration: InputDecoration(
             hintText: hint,
@@ -671,11 +612,11 @@ class _RegistrationFormState extends State<RegistrationForm> {
             value: _consentChecked,
             onChanged: (val) => setState(() => _consentChecked = val ?? false),
             title: const Text(
-              'Accord de Consentement',
+              'Consent Agreement',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             subtitle: const Text(
-              'Le patient consent au stockage des données d\'urgence.',
+              'The patient consents to the storage of emergency data.',
               style: TextStyle(color: AppColors.grey),
             ),
             controlAffinity: ListTileControlAffinity.leading,
@@ -691,7 +632,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
                 TextButton(
                   onPressed: () => Navigator.pop(context),
                   child: const Text(
-                    'ANNULER',
+                    'CANCEL',
                     style: TextStyle(color: Colors.red),
                   ),
                 ),
@@ -715,9 +656,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
                           ),
                         )
                       : Text(
-                          widget.patientToEdit != null
-                              ? 'METTRE À JOUR'
-                              : 'CONTINUER',
+                          widget.patientToEdit != null ? 'UPDATE' : 'CONTINUE',
                         ),
                 ),
               ],
@@ -729,7 +668,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
   }
 }
 
-/// CORRECTION LOGIQUE : Calcul précis de l'âge
+/// NOTE: Precise age calculation logic
 int calculateAge(DateTime birthDate) {
   DateTime today = DateTime.now();
   int age = today.year - birthDate.year;

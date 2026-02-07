@@ -17,23 +17,23 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   final List<OnboardingContent> _pages = [
     OnboardingContent(
-      title: 'Gestion des Urgences',
+      title: 'Emergency Management',
       description:
-          'Accédez rapidement aux dossiers patients en situation d\'urgence avec notre système de scan biométrique avancé.',
+          'Quickly access patient records in emergency situations with our advanced biometric scanning system.',
       icon: Icons.emergency,
       color: AppColors.emergencyRed,
     ),
     OnboardingContent(
-      title: 'Suivi des Patients',
+      title: 'Patient Monitoring',
       description:
-          'Consultez et mettez à jour les signes vitaux et les informations médicales en temps réel.',
+          'View and update vital signs and medical information in real time.',
       icon: Icons.monitor_heart,
       color: AppColors.patientBlue,
     ),
     OnboardingContent(
-      title: 'Journal de Consultation',
+      title: 'Consultation Log',
       description:
-          'Gardez une trace complète de tous les accès et consultations pour une meilleure traçabilité.',
+          'Keep a complete record of all access and consultations for enhanced traceability.',
       icon: Icons.history_edu,
       color: AppColors.primaryTeal,
     ),
@@ -60,7 +60,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 child: TextButton(
                   onPressed: () => _navigateToLogin(),
                   child: Text(
-                    'Passer',
+                    'Skip',
                     style: TextStyle(
                       color: AppColors.grey,
                       fontSize: 16,
@@ -103,9 +103,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: GeneralUtils().generalButton(
                 backColor: _pages[_currentPage].color,
-                text: _currentPage == _pages.length - 1
-                    ? 'Commencer'
-                    : 'Suivant',
+                text: _currentPage == _pages.length - 1 ? 'Start' : 'Next',
                 tapAction: () {
                   if (_currentPage == _pages.length - 1) {
                     _navigateToLogin();

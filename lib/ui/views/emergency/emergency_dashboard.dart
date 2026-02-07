@@ -1,12 +1,10 @@
 import 'package:afya_id/domain/domain.dart';
-import 'package:afya_id/ui/providers/general_provider.dart';
 import 'package:afya_id/ui/views/emergency/biometric_scan_view.dart';
 import 'package:afya_id/ui/views/patient/patient_vital_card.dart';
 import 'package:flutter/material.dart';
 import 'package:afya_id/ui/styles/app_colors.dart';
 import 'package:afya_id/data/models/patient_model.dart';
 import 'package:afya_id/data/services/patient_firestore_service.dart';
-import 'package:provider/provider.dart';
 
 class EmergencyDashboard extends StatefulWidget {
   const EmergencyDashboard({super.key});
@@ -55,7 +53,7 @@ class _EmergencyDashboardState extends State<EmergencyDashboard>
     } catch (e) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Erreur de recherche: $e')));
+      ).showSnackBar(SnackBar(content: Text('Search error: $e')));
     }
   }
 
@@ -68,7 +66,7 @@ class _EmergencyDashboardState extends State<EmergencyDashboard>
 
   @override
   Widget build(BuildContext context) {
-    // Sinon, afficher le tableau de bord d'urgence
+    // Otherwise, display the emergency dashboard
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
       child: Center(
@@ -77,10 +75,10 @@ class _EmergencyDashboardState extends State<EmergencyDashboard>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 20),
+              // const SizedBox(height: 20),
 
-              _buildTitleArea(context),
-              const SizedBox(height: 20),
+              // _buildTitleArea(context),
+              // const SizedBox(height: 20),
               _buildSearchBar(context),
               const SizedBox(height: 10),
 
@@ -117,7 +115,7 @@ class _EmergencyDashboardState extends State<EmergencyDashboard>
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'Rechercher un patient par nom ou ID...',
+                hintText: 'Search patient by name or ID...',
                 border: InputBorder.none,
                 hintStyle: const TextStyle(color: Colors.grey),
               ),
@@ -140,7 +138,6 @@ class _EmergencyDashboardState extends State<EmergencyDashboard>
   }
 
   Widget _buildSearchResultsList(BuildContext context) {
-    final provider = Provider.of<GeneralProvider>(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -210,7 +207,7 @@ class _EmergencyDashboardState extends State<EmergencyDashboard>
                           ),
                         ),
                         Text(
-                          'Groupe Sanguin: ${patient.bloodGroup}',
+                          'Blood Type: ${patient.bloodGroup}',
                           style: const TextStyle(
                             color: Colors.grey,
                             fontSize: 12,
@@ -244,7 +241,7 @@ class _EmergencyDashboardState extends State<EmergencyDashboard>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Tableau de Bord Urgence',
+                  'Emergekncy Dashboard',
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.w900,
@@ -261,7 +258,7 @@ class _EmergencyDashboardState extends State<EmergencyDashboard>
                     ),
                     Expanded(
                       child: Text(
-                        'Centre de commande mobile - Zone 4',
+                        'Mobile command center - Zone 4',
                         style: TextStyle(
                           color: AppColors.emergencyRed.withValues(alpha: 0.8),
                           fontWeight: FontWeight.w500,
@@ -275,13 +272,13 @@ class _EmergencyDashboardState extends State<EmergencyDashboard>
           ),
 
           Spacer(),
-          _buildMiniStat('12', 'PATIENTS ACTIFS'),
+          _buildMiniStat('12', 'ACTIVE PATIENTS'),
           Container(
             width: 1,
             height: 40,
             color: Colors.grey.withValues(alpha: 0.2),
           ),
-          _buildMiniStat('03', 'ALERTES CRITIQUES', isCritical: true),
+          _buildMiniStat('03', 'CRITICAL ALERTS', isCritical: true),
         ],
       ),
     );
@@ -392,7 +389,7 @@ class _EmergencyDashboardState extends State<EmergencyDashboard>
                   ),
                   const SizedBox(height: 8),
                   const Text(
-                    'SCAN D\'URGENCE',
+                    'EMERGENCY SCAN',
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w900,
@@ -416,8 +413,8 @@ class _EmergencyDashboardState extends State<EmergencyDashboard>
           Expanded(
             child: _buildActionCard(
               Icons.face_rounded,
-              'Reconnaissance Faciale',
-              'Identifier via scan biométrique',
+              'Facial Recognition',
+              'Identify via biometric scan',
               onTap: () {
                 NavigationUtils().pagePush(
                   context,
@@ -432,8 +429,8 @@ class _EmergencyDashboardState extends State<EmergencyDashboard>
           Expanded(
             child: _buildActionCard(
               Icons.fingerprint_rounded,
-              'Empreinte Digitale',
-              'Scanner l\'index ou le pouce',
+              'Fingerprint',
+              'Scan index or thumb',
               onTap: () {
                 NavigationUtils().pagePush(
                   context,
@@ -533,7 +530,7 @@ class _EmergencyDashboardState extends State<EmergencyDashboard>
           const SizedBox(width: 12),
           const Expanded(
             child: Text(
-              'Assurez-vous que le patient est stabilisé avant le scan.',
+              'Ensure that the patient is stabilized before scanning.',
               style: TextStyle(
                 color: Colors.orange,
                 fontWeight: FontWeight.w600,
