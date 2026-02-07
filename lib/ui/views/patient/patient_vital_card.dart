@@ -3,6 +3,7 @@ import 'package:afya_id/ui/styles/app_colors.dart';
 import 'package:afya_id/domain/utils/general_utils.dart';
 import 'package:afya_id/data/models/models.dart';
 import 'package:afya_id/data/services/services.dart';
+import 'package:afya_id/ui/views/registration/registration_form.dart';
 
 class PatientVitalCard extends StatefulWidget {
   final String? initialPatientId;
@@ -17,7 +18,6 @@ class _PatientVitalCardState extends State<PatientVitalCard> {
   final TextEditingController _searchController = TextEditingController();
   final PatientFirestoreService _patientService = PatientFirestoreService();
   List<PatientModel> _filteredPatients = [];
-  List<PatientModel> _allPatients = [];
 
   @override
   void initState() {
@@ -87,10 +87,8 @@ class _PatientVitalCardState extends State<PatientVitalCard> {
 
         // Update filtered patients when data changes
         if (_searchController.text.isEmpty) {
-          _allPatients = patients;
           _filteredPatients = patients;
         } else {
-          _allPatients = patients;
           _filterPatients(_searchController.text, patients);
         }
 
@@ -247,11 +245,58 @@ class _PatientVitalCardState extends State<PatientVitalCard> {
 }
 // ORIGINAL CONTENT REFACTORED INTO A STATLESS WIDGET FOR DETAILS
 
-class _PatientDetailsView extends StatelessWidget {
+class _PatientDetailsView extends StatefulWidget {
   final PatientModel patient;
   final VoidCallback onBack;
 
   const _PatientDetailsView({required this.patient, required this.onBack});
+
+  @override
+  State<_PatientDetailsView> createState() => _PatientDetailsViewState();
+}
+
+class _PatientDetailsViewState extends State<_PatientDetailsView> {
+  final PatientFirestoreService _patientService = PatientFirestoreService();
+
+  Future<void> _deletePatient() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirmer la suppression'),
+        content: Text(
+          'Êtes-vous sûr de vouloir supprimer le patient ${widget.patient.fullName}?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('ANNULER'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('SUPPRIMER', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      try {
+        await _patientService.deletePatient(widget.patient.id);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Patient supprimé avec succès')),
+          );
+          widget.onBack();
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Erreur: $e')));
+        }
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -304,7 +349,7 @@ class _PatientDetailsView extends StatelessWidget {
         GeneralUtils().generalButton(
           padding: EdgeInsets.symmetric(horizontal: 4),
           radius: 16,
-          tapAction: onBack,
+          tapAction: widget.onBack,
           child: Row(
             children: [
               const Icon(Icons.arrow_back, size: 16, color: AppColors.grey),
@@ -319,7 +364,7 @@ class _PatientDetailsView extends StatelessWidget {
         const SizedBox(width: 8),
         const Icon(Icons.chevron_right, size: 16, color: AppColors.grey),
         Text(
-          'Fiche Patient #${patient.id}',
+          'Fiche Patient #${widget.patient.id}',
           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
         ),
         const Spacer(),
@@ -398,7 +443,7 @@ class _PatientDetailsView extends StatelessWidget {
                             // borderRadius: BorderRadius.circular(12),
                             shape: BoxShape.circle,
                             image: DecorationImage(
-                              image: NetworkImage(patient.imageUrl),
+                              image: NetworkImage(widget.patient.imageUrl),
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -426,7 +471,7 @@ class _PatientDetailsView extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '${patient.firstName} ${patient.lastName}',
+                            '${widget.patient.firstName} ${widget.patient.lastName}',
                             style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
@@ -441,7 +486,7 @@ class _PatientDetailsView extends StatelessWidget {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                'ID: #${patient.id}-AFY',
+                                'ID: #${widget.patient.id}-AFY',
                                 style: const TextStyle(
                                   color: AppColors.grey,
                                   fontSize: 13,
@@ -452,9 +497,9 @@ class _PatientDetailsView extends StatelessWidget {
                           const SizedBox(height: 8),
                           Row(
                             children: [
-                              _buildPill('${patient.age} ANS'),
+                              _buildPill('${widget.patient.age} ANS'),
                               const SizedBox(width: 8),
-                              _buildPill(patient.gender),
+                              _buildPill(widget.patient.gender),
                             ],
                           ),
                         ],
@@ -472,7 +517,10 @@ class _PatientDetailsView extends StatelessWidget {
                       ), // Placeholder, logic can be added
                     ),
                     Expanded(
-                      child: _buildInfoItem('LOCALISATION', patient.location),
+                      child: _buildInfoItem(
+                        'LOCALISATION',
+                        widget.patient.location,
+                      ),
                     ),
                   ],
                 ),
@@ -692,7 +740,7 @@ class _PatientDetailsView extends StatelessWidget {
             Expanded(
               child: _buildCriticalCard(
                 'GROUPE SANGUIN',
-                patient.bloodGroup,
+                widget.patient.bloodGroup,
                 Colors.redAccent,
                 Icons.bloodtype,
               ),
@@ -701,7 +749,7 @@ class _PatientDetailsView extends StatelessWidget {
             Expanded(
               child: _buildCriticalCard(
                 'ALLERGIE SÉVÈRE',
-                patient.allergy,
+                widget.patient.allergy,
                 AppColors.surfacePatientDark,
                 Icons.warning_rounded,
                 isAllergy: true,
@@ -933,9 +981,10 @@ class _PatientDetailsView extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: _buildActionButton(
-                Icons.picture_as_pdf,
-                'EXPORTER',
+                Icons.delete,
+                'SUPPRIMER',
                 context,
+                isDelete: true,
               ),
             ),
           ],
@@ -948,16 +997,41 @@ class _PatientDetailsView extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton(IconData icon, String label, BuildContext context) {
+  Widget _buildActionButton(
+    IconData icon,
+    String label,
+    BuildContext context, {
+    bool isDelete = false,
+  }) {
     return ElevatedButton.icon(
-      onPressed: () {},
+      onPressed: () {
+        if (label == 'ÉDITER') {
+          // Naviguer vers la page d'édition avec le patient
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) =>
+                  RegistrationForm(patientToEdit: widget.patient),
+            ),
+          );
+        } else if (isDelete) {
+          _deletePatient();
+        }
+      },
       icon: Icon(icon, size: 18),
       label: Text(label),
       style: ElevatedButton.styleFrom(
-        backgroundColor: Theme.of(context).colorScheme.onSurface,
-        foregroundColor: Theme.of(context).colorScheme.surface,
+        backgroundColor: isDelete
+            ? Colors.red
+            : Theme.of(context).colorScheme.onSurface,
+        foregroundColor: isDelete
+            ? Colors.white
+            : Theme.of(context).colorScheme.surface,
         padding: const EdgeInsets.symmetric(vertical: 16),
-        side: BorderSide(color: Theme.of(context).colorScheme.onSurface),
+        side: BorderSide(
+          color: isDelete
+              ? Colors.red
+              : Theme.of(context).colorScheme.onSurface,
+        ),
       ),
     );
   }

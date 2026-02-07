@@ -64,10 +64,12 @@ class PatientFirestoreService {
   }
 
   // UPDATE - Mettre à jour un patient
-  Future<void> updatePatient(String id, Map<String, dynamic> data) async {
+  Future<void> updatePatient(PatientModel patient) async {
     try {
-      data['updatedAt'] = Timestamp.now();
-      await _firestore.collection(_collection).doc(id).update(data);
+      await _firestore
+          .collection(_collection)
+          .doc(patient.id)
+          .update(patient.toJson());
     } catch (e) {
       throw Exception('Erreur lors de la mise à jour du patient: $e');
     }
@@ -115,14 +117,14 @@ class PatientFirestoreService {
   }
 
   // UPDATE VITAL SIGNS - Mettre à jour les signes vitaux
-  Future<void> updateVitalSigns(
-    String patientId,
-    Map<String, dynamic> vitalSigns,
-  ) async {
-    try {
-      await updatePatient(patientId, {'latestVitalSigns': vitalSigns});
-    } catch (e) {
-      throw Exception('Erreur lors de la mise à jour des signes vitaux: $e');
-    }
-  }
+  // Future<void> updateVitalSigns(
+  //   String patientId,
+  //   Map<String, dynamic> vitalSigns,
+  // ) async {
+  //   try {
+  //     await updatePatient(patientId, {'latestVitalSigns': vitalSigns});
+  //   } catch (e) {
+  //     throw Exception('Erreur lors de la mise à jour des signes vitaux: $e');
+  //   }
+  // }
 }
