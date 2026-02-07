@@ -230,52 +230,60 @@ class _EmergencyDashboardState extends State<EmergencyDashboard>
   }
 
   Widget _buildTitleArea(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Tableau de Bord Urgence',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: -1,
+    return SizedBox(
+      width: .maxFinite,
+      child: Wrap(
+        spacing: 24,
+        runSpacing: 10,
+        crossAxisAlignment: WrapCrossAlignment.end,
+        alignment: WrapAlignment.spaceBetween,
+        children: [
+          IntrinsicWidth(
+            child: Column(
+              spacing: 4,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Tableau de Bord Urgence',
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -1,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  const Icon(
-                    Icons.location_on,
-                    color: AppColors.emergencyRed,
-                    size: 16,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    'Centre de commande mobile - Zone 4',
-                    style: TextStyle(
-                      color: AppColors.emergencyRed.withValues(alpha: 0.8),
-                      fontWeight: FontWeight.w500,
+                Row(
+                  spacing: 4,
+                  children: [
+                    const Icon(
+                      Icons.location_on,
+                      color: AppColors.emergencyRed,
+                      size: 16,
                     ),
-                  ),
-                ],
-              ),
-            ],
+                    Expanded(
+                      child: Text(
+                        'Centre de commande mobile - Zone 4',
+                        style: TextStyle(
+                          color: AppColors.emergencyRed.withValues(alpha: 0.8),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
-        _buildMiniStat('12', 'PATIENTS ACTIFS'),
-        const SizedBox(width: 24),
-        Container(
-          width: 1,
-          height: 40,
-          color: Colors.grey.withValues(alpha: 0.2),
-        ),
-        const SizedBox(width: 24),
-        _buildMiniStat('03', 'ALERTES CRITIQUES', isCritical: true),
-      ],
+
+          Spacer(),
+          _buildMiniStat('12', 'PATIENTS ACTIFS'),
+          Container(
+            width: 1,
+            height: 40,
+            color: Colors.grey.withValues(alpha: 0.2),
+          ),
+          _buildMiniStat('03', 'ALERTES CRITIQUES', isCritical: true),
+        ],
+      ),
     );
   }
 
@@ -402,40 +410,42 @@ class _EmergencyDashboardState extends State<EmergencyDashboard>
   }
 
   Widget _buildSecondaryActionCards(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: _buildActionCard(
-            Icons.face_rounded,
-            'Reconnaissance Faciale',
-            'Identifier via scan biométrique',
-            onTap: () {
-              NavigationUtils().pagePush(
-                context,
-                BiometricScanView(isFace: true),
-              );
-            },
-            // onTap: () =>
-            //     context.pushNamed(RoutesPaths.biometricScan, extra: true),
+    return IntrinsicHeight(
+      child: Row(
+        children: [
+          Expanded(
+            child: _buildActionCard(
+              Icons.face_rounded,
+              'Reconnaissance Faciale',
+              'Identifier via scan biométrique',
+              onTap: () {
+                NavigationUtils().pagePush(
+                  context,
+                  BiometricScanView(isFace: true),
+                );
+              },
+              // onTap: () =>
+              //     context.pushNamed(RoutesPaths.biometricScan, extra: true),
+            ),
           ),
-        ),
-        const SizedBox(width: 24),
-        Expanded(
-          child: _buildActionCard(
-            Icons.fingerprint_rounded,
-            'Empreinte Digitale',
-            'Scanner l\'index ou le pouce',
-            onTap: () {
-              NavigationUtils().pagePush(
-                context,
-                BiometricScanView(isFace: false),
-              );
-            },
-            // onTap: () =>
-            //     context.pushNamed(RoutesPaths.biometricScan, extra: false),
+          const SizedBox(width: 24),
+          Expanded(
+            child: _buildActionCard(
+              Icons.fingerprint_rounded,
+              'Empreinte Digitale',
+              'Scanner l\'index ou le pouce',
+              onTap: () {
+                NavigationUtils().pagePush(
+                  context,
+                  BiometricScanView(isFace: false),
+                );
+              },
+              // onTap: () =>
+              //     context.pushNamed(RoutesPaths.biometricScan, extra: false),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -463,39 +473,45 @@ class _EmergencyDashboardState extends State<EmergencyDashboard>
         onTap: onTap,
         borderRadius: BorderRadius.circular(24),
         child: Row(
+          mainAxisAlignment: .center,
           children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppColors.emergencyRed.withValues(alpha: 0.05),
-                shape: BoxShape.circle,
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.emergencyRed.withValues(alpha: 0.05),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: AppColors.emergencyRed, size: 32),
               ),
-              child: Icon(icon, color: AppColors.emergencyRed, size: 32),
             ),
             const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
+            if (!AdaptiveUtil.isCompact(context))
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(color: Colors.grey, fontSize: 13),
-                  ),
-                ],
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(color: Colors.grey, fontSize: 13),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const Icon(
-              Icons.arrow_forward_ios_rounded,
-              color: Colors.grey,
-              size: 16,
+            Expanded(
+              child: const Icon(
+                Icons.arrow_forward_ios_rounded,
+                color: Colors.grey,
+                size: 16,
+              ),
             ),
           ],
         ),
