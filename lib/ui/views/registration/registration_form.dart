@@ -1,3 +1,4 @@
+import 'package:afya_id/domain/domain.dart';
 import 'package:afya_id/ui/ui.dart';
 import 'package:flutter/material.dart';
 import 'package:afya_id/ui/styles/app_colors.dart';
@@ -366,6 +367,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
               const SizedBox(height: 12),
               Wrap(
                 spacing: 8,
+                runSpacing: 8,
                 children: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
                     .map((type) {
                       return ChoiceChip(
@@ -433,26 +435,28 @@ class _RegistrationFormState extends State<RegistrationForm> {
           context,
           icon: Icons.fingerprint_rounded,
           title: 'Enrôlement Biométrique',
-          child: Row(
-            children: [
-              Expanded(
-                child: _buildBiometricCard(
-                  Icons.face_rounded,
-                  'Reconnaissance Faciale',
-                  'Capturer le portrait frontal.',
-                  false,
+          child: IntrinsicHeight(
+            child: Row(
+              children: [
+                Expanded(
+                  child: _buildBiometricCard(
+                    Icons.face_rounded,
+                    'Reconnaissance Faciale',
+                    'Capturer le portrait frontal.',
+                    false,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 24),
-              Expanded(
-                child: _buildBiometricCard(
-                  Icons.fingerprint_rounded,
-                  'Empreinte Digitale',
-                  'Scanner l\'index droit.',
-                  true,
+                const SizedBox(width: 24),
+                Expanded(
+                  child: _buildBiometricCard(
+                    Icons.fingerprint_rounded,
+                    'Empreinte Digitale',
+                    'Scanner l\'index droit.',
+                    true,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ],
@@ -479,11 +483,13 @@ class _RegistrationFormState extends State<RegistrationForm> {
             children: [
               Icon(icon, color: AppColors.primaryTeal),
               const SizedBox(width: 12),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],
@@ -519,33 +525,44 @@ class _RegistrationFormState extends State<RegistrationForm> {
               color: AppColors.primaryTeal.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: AppColors.primaryTeal, size: 40),
+            alignment: .center,
+            child: Center(
+              child: Icon(icon, color: AppColors.primaryTeal, size: 40),
+            ),
           ),
-          const SizedBox(height: 16),
-          Text(
-            title,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            subtitle,
-            style: const TextStyle(color: Colors.grey, fontSize: 12),
-            textAlign: TextAlign.center,
-          ),
+          if (!AdaptiveUtil.isCompact(context)) ...[
+            const SizedBox(height: 16),
+            Text(
+              title,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              subtitle,
+              style: const TextStyle(color: Colors.grey, fontSize: 12),
+              textAlign: TextAlign.center,
+            ),
+          ],
           const SizedBox(height: 24),
+          Spacer(),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
               onPressed: () {},
+
               icon: Icon(
                 !isFingerPrint
                     ? Icons.camera_alt_rounded
                     : Icons.sensors_rounded,
                 size: 18,
               ),
-              label: Text(
-                !isFingerPrint ? 'CAPTURER VISAGE' : 'ENREGISTRER EMPREINTE',
-              ),
+              label: !AdaptiveUtil.isCompact(context)
+                  ? Text(
+                      !isFingerPrint
+                          ? 'CAPTURER VISAGE'
+                          : 'ENREGISTRER EMPREINTE',
+                    )
+                  : Container(),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryTeal,
                 foregroundColor: AppColors.white0,
@@ -664,43 +681,47 @@ class _RegistrationFormState extends State<RegistrationForm> {
             controlAffinity: ListTileControlAffinity.leading,
           ),
           const SizedBox(height: 24),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text(
-                  'ANNULER',
-                  style: TextStyle(color: Colors.red),
-                ),
-              ),
-              const SizedBox(width: 12),
-              ElevatedButton(
-                onPressed: _isLoading ? null : _savePatient,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryTeal,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 32,
-                    vertical: 16,
+          SizedBox(
+            width: .maxFinite,
+            child: Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              alignment: .end,
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text(
+                    'ANNULER',
+                    style: TextStyle(color: Colors.red),
                   ),
                 ),
-                child: _isLoading
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
+                ElevatedButton(
+                  onPressed: _isLoading ? null : _savePatient,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryTeal,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 16,
+                    ),
+                  ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : Text(
+                          widget.patientToEdit != null
+                              ? 'METTRE À JOUR'
+                              : 'CONTINUER',
                         ),
-                      )
-                    : Text(
-                        widget.patientToEdit != null
-                            ? 'METTRE À JOUR'
-                            : 'CONTINUER',
-                      ),
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
         ],
       ),

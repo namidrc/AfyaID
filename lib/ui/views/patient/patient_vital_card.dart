@@ -1,3 +1,4 @@
+import 'package:afya_id/domain/utils/adaptive_util.dart';
 import 'package:afya_id/domain/utils/date_util.dart';
 import 'package:flutter/material.dart';
 import 'package:afya_id/ui/styles/app_colors.dart';
@@ -227,21 +228,25 @@ class _PatientVitalCardState extends State<PatientVitalCard> {
               ),
             ),
             // Patient ID Badge
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: AppColors.patientBlue.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                "#${patient.id}",
-                style: const TextStyle(
-                  color: AppColors.patientBlue,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
+            if (!AdaptiveUtil.isCompact(context))
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.patientBlue.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  "#${patient.id}",
+                  style: const TextStyle(
+                    color: AppColors.patientBlue,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
                 ),
               ),
-            ),
           ],
         ),
       ),
@@ -351,60 +356,37 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
   }
 
   Widget _buildBreadcrumb(BuildContext context) {
-    return Row(
+    return Wrap(
+      runSpacing: 8,
+      spacing: 8,
+      crossAxisAlignment: .center,
       children: [
-        GeneralUtils().generalButton(
-          backColor: Theme.of(context).colorScheme.primary,
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          radius: 16,
-          tapAction: widget.onBack,
-          child: Row(
-            spacing: 4,
-            children: [
-              const Icon(Icons.arrow_back, size: 16, color: AppColors.white0),
-              Text(
-                'Liste Patients',
-                style: TextStyle(color: AppColors.white0, fontWeight: .bold),
-              ),
-            ],
+        IntrinsicWidth(
+          child: GeneralUtils().generalButton(
+            backColor: Theme.of(context).colorScheme.primary,
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            radius: 16,
+            tapAction: widget.onBack,
+            child: Row(
+              spacing: 4,
+              children: [
+                const Icon(Icons.arrow_back, size: 16, color: AppColors.white0),
+                Text(
+                  'Liste Patients',
+                  style: TextStyle(color: AppColors.white0, fontWeight: .bold),
+                ),
+              ],
+            ),
           ),
         ),
-        const SizedBox(width: 8),
         const Icon(Icons.chevron_right, size: 16, color: AppColors.grey),
-        Text(
-          'Fiche Patient #${widget.patient.id}',
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+        Expanded(
+          child: Text(
+            'Fiche Patient #${widget.patient.id}',
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+          ),
         ),
         const Spacer(),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(
-            color: AppColors.green.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(4),
-            border: Border.all(color: AppColors.green.withValues(alpha: 0.2)),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 8,
-                height: 8,
-                decoration: const BoxDecoration(
-                  color: AppColors.green,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: 8),
-              const Text(
-                'SYNCHRONISÉ',
-                style: TextStyle(
-                  color: AppColors.green,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 10,
-                ),
-              ),
-            ],
-          ),
-        ),
       ],
     );
   }
@@ -422,7 +404,6 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
           Icons.warning_rounded,
           isAllergy: true,
         ),
-        _buildVitalsCard(context),
       ],
     );
   }
@@ -448,40 +429,41 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
             child: Column(
               children: [
                 Row(
+                  spacing: 20,
                   children: [
-                    Stack(
-                      children: [
-                        Container(
-                          width: 80,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            color: AppColors.grey2,
-                            // borderRadius: BorderRadius.circular(12),
-                            shape: BoxShape.circle,
-                            image: DecorationImage(
-                              image: NetworkImage(widget.patient.imageUrl),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          bottom: -4,
-                          right: -4,
-                          child: Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: const BoxDecoration(
+                    if (!AdaptiveUtil.isCompact(context))
+                      Stack(
+                        children: [
+                          Container(
+                            width: 80,
+                            height: 80,
+                            decoration: BoxDecoration(
+                              color: AppColors.grey2,
+                              // borderRadius: BorderRadius.circular(12),
                               shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.verified,
-                              color: Colors.blue,
-                              size: 20,
+                              image: DecorationImage(
+                                image: NetworkImage(widget.patient.imageUrl),
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(width: 20),
+                          Positioned(
+                            bottom: -4,
+                            right: -4,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.verified,
+                                color: Colors.blue,
+                                size: 20,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -494,18 +476,20 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
                             ),
                           ),
                           Row(
+                            spacing: 4,
                             children: [
                               const Icon(
                                 Icons.fingerprint,
                                 size: 16,
                                 color: AppColors.grey,
                               ),
-                              const SizedBox(width: 4),
-                              Text(
-                                'ID: #${widget.patient.id}',
-                                style: const TextStyle(
-                                  color: AppColors.grey,
-                                  fontSize: 13,
+                              Expanded(
+                                child: Text(
+                                  'ID: #${widget.patient.id}',
+                                  style: const TextStyle(
+                                    color: AppColors.grey,
+                                    fontSize: 13,
+                                  ),
                                 ),
                               ),
                             ],
@@ -583,129 +567,6 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
           style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
         ),
       ],
-    );
-  }
-
-  Widget _buildVitalsCard(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.grey.withValues(alpha: 0.3)),
-      ),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Row(
-                  children: [
-                    Icon(
-                      Icons.favorite,
-                      color: AppColors.patientBlue,
-                      size: 20,
-                    ),
-                    SizedBox(width: 12),
-                    Text(
-                      'Constantes Vitales',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ],
-                ),
-                Text(
-                  'Il y a 15 min',
-                  style: TextStyle(color: AppColors.grey, fontSize: 12),
-                ),
-              ],
-            ),
-          ),
-          const Divider(height: 1, color: AppColors.grey),
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: GridView.count(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 2,
-              mainAxisSpacing: 16,
-              crossAxisSpacing: 16,
-              childAspectRatio: 1.5,
-              children: [
-                _buildVitalMetric(
-                  'FC (BPM)',
-                  '88',
-                  Icons.favorite,
-                  Colors.pinkAccent,
-                  context,
-                ),
-                _buildVitalMetric(
-                  'SpO2 (%)',
-                  '98',
-                  Icons.air,
-                  Colors.cyan,
-                  context,
-                ),
-              ],
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.grey.withValues(alpha: 0.3)),
-            ),
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'TENSION ARTÉRIELLE',
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: AppColors.grey,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      '120/80 mmHg',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-                Chip(
-                  label: const Text(
-                    'NORMALE',
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                  backgroundColor: AppColors.green,
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8),
-          TextButton(
-            onPressed: () {},
-            child: const Text('VOIR L\'HISTORIQUE COMPLET'),
-          ),
-          const SizedBox(height: 12),
-        ],
-      ),
     );
   }
 
@@ -859,18 +720,22 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Row(
-                  children: [
-                    Icon(Icons.history, color: AppColors.grey, size: 20),
-                    SizedBox(width: 12),
-                    Text(
-                      'Antécédents & Notes',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
+                Expanded(
+                  child: const Row(
+                    spacing: 12,
+                    children: [
+                      Icon(Icons.history, color: AppColors.grey, size: 20),
+                      Expanded(
+                        child: Text(
+                          'Antécédents & Notes',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 IconButton(
                   icon: Icon(
@@ -938,11 +803,13 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
                     ),
                     _buildStatusPill(status),
@@ -986,11 +853,11 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
     return Column(
       children: [
         Row(
+          spacing: 10,
           children: [
             Expanded(
               child: _buildActionButton(Icons.edit_document, 'ÉDITER', context),
             ),
-            const SizedBox(width: 12),
             Expanded(
               child: _buildActionButton(
                 Icons.delete,
@@ -1030,7 +897,7 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
         }
       },
       icon: Icon(icon, size: 18),
-      label: Text(label),
+      label: Text(AdaptiveUtil.isCompact(context) ? "" : label),
       style: ElevatedButton.styleFrom(
         backgroundColor: isDelete
             ? Colors.red
@@ -1067,12 +934,14 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
                 size: 18,
               ),
               SizedBox(width: 12),
-              Text(
-                'Traitements Actifs',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                  color: AppColors.grey,
+              Expanded(
+                child: Text(
+                  'Traitements Actifs',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    color: AppColors.grey,
+                  ),
                 ),
               ),
             ],
@@ -1091,18 +960,23 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
       children: [
         const Icon(Icons.check_circle, color: AppColors.green, size: 18),
         const SizedBox(width: 12),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-            ),
-            Text(
-              dosage,
-              style: const TextStyle(color: AppColors.grey, fontSize: 12),
-            ),
-          ],
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+              ),
+              Text(
+                dosage,
+                style: const TextStyle(color: AppColors.grey, fontSize: 12),
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -1144,21 +1018,26 @@ class _PatientDetailsViewState extends State<_PatientDetailsView> {
                 child: Icon(Icons.person, color: AppColors.grey),
               ),
               const SizedBox(width: 12),
-              const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Dr. Kakule", // Mocked data
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
+              Expanded(
+                child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Dr. Kakule", // Mocked data
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
                     ),
-                  ),
-                  Text(
-                    "+243 999 123 456", // Mocked data
-                    style: const TextStyle(color: AppColors.grey, fontSize: 12),
-                  ),
-                ],
+                    Text(
+                      "+243 999 123 456", // Mocked data
+                      style: const TextStyle(
+                        color: AppColors.grey,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
