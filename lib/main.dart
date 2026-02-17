@@ -1,5 +1,6 @@
 import 'package:afya_id/data/models/user_model.dart';
 import 'package:afya_id/data/services/user_firestore_service.dart';
+import 'package:afya_id/ui/providers/patient_provider.dart';
 import 'package:afya_id/ui/ui.dart';
 import 'package:flutter/material.dart';
 import 'package:afya_id/domain/constants/constants.dart';
@@ -26,6 +27,7 @@ void main() async {
         ChangeNotifierProvider(
           create: (context) => GeneralProvider()..getPrefs(pref),
         ),
+        ChangeNotifierProvider(create: (context) => PatientProvider()),
       ],
       child: AfyaID(userID: userID),
     ),

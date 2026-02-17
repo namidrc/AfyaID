@@ -1,5 +1,7 @@
 import 'package:afya_id/domain/utils/adaptive_util.dart';
 import 'package:afya_id/domain/utils/date_util.dart';
+import 'package:afya_id/ui/providers/general_provider.dart';
+import 'package:afya_id/ui/providers/patient_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:afya_id/ui/styles/app_colors.dart';
 import 'package:afya_id/domain/utils/general_utils.dart';
@@ -7,6 +9,7 @@ import 'package:afya_id/data/models/models.dart';
 import 'package:afya_id/data/services/services.dart';
 import 'package:afya_id/ui/views/registration/registration_form.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 class PatientVitalCard extends StatefulWidget {
   final String? initialPatientId;
@@ -28,7 +31,8 @@ class _PatientVitalCardState extends State<PatientVitalCard> {
     _selectedPatientId = widget.initialPatientId;
   }
 
-  void _filterPatients(String query, List<PatientModel> patients) {
+  void _filterPatients(String query, List<PatientModel> patients, context) {
+    final provider = Provider.of<PatientProvider>(context, listen: false);
     setState(() {
       if (query.isEmpty) {
         _filteredPatients = patients;
@@ -40,6 +44,9 @@ class _PatientVitalCardState extends State<PatientVitalCard> {
         }).toList();
       }
     });
+
+    provider.recharge(patients);
+    provider.recharge(_filteredPatients);
   }
 
   @override
@@ -95,7 +102,7 @@ class _PatientVitalCardState extends State<PatientVitalCard> {
         if (_searchController.text.isEmpty) {
           _filteredPatients = patients;
         } else {
-          _filterPatients(_searchController.text, patients);
+          _filterPatients(_searchController.text, patients, context);
         }
 
         return SingleChildScrollView(
@@ -117,7 +124,9 @@ class _PatientVitalCardState extends State<PatientVitalCard> {
                   GeneralUtils().generalSearchBar(
                     context,
                     searchBarController: _searchController,
-                    onChanged: (query) => _filterPatients(query, patients),
+                    onChanged: (query) {
+                      _filterPatients(query, patients, context);
+                    },
                   ),
                   const SizedBox(height: 24),
                   if (_filteredPatients.isEmpty)
